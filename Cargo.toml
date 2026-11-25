@@ -1,0 +1,16 @@
+[workspace]
+resolver = "3"
+members = ["crates/tsulink"]
+
+[workspace.package]
+edition = "2024"
+license = "Apache-2.0"
+repository = "https://github.com/tsudev-org/tsulink"
+rust-version = "1.97"
+
+[profile.release]
+strip = "symbols"
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+debug = false

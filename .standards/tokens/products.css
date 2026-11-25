@@ -1,0 +1,346 @@
+/* ============================================================
+   tsudev-design-tokens v4.0.0 - LỚP BẢN SẮC SẢN PHẨM - SINH TỰ ĐỘNG, KHÔNG SỬA TAY
+   Nguồn: tokens/products/<id>.json   Sinh lại: node scripts/build-tokens.mjs
+   Cách dùng: nạp SAU tokens.css, đặt <html data-product="<id>" data-theme="light|dark">
+   ============================================================ */
+
+/* La bàn - tsudev-tsudev/app-la-ban | bố cục do-luong | bo góc tron | hoạ tiết vong-dong-tam */
+:root[data-product="compass"] {
+  --text-link: #943F03;
+  --primary: #AE4C05;
+  --primary-hover: #943F03;
+  --primary-active: #7B3301;
+  --on-primary: #FFFFFF;
+  --focus-ring: #AE4C05;
+  --accent: #813601;
+  --glow: rgba(174, 76, 5, 0.1);
+  --icon-info: #AE4C05;
+  --icon-nav: #943F03;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-control: 999px;
+  --font-display: 'Montserrat', var(--font-family);
+}
+:root[data-product="compass"][data-theme="dark"] {
+  --text-link: #FF9F6F;
+  --primary: #FF843F;
+  --primary-hover: #FEA477;
+  --primary-active: #E66D24;
+  --on-primary: #0A0A0A;
+  --focus-ring: #FF843F;
+  --accent: #FEBD9D;
+  --glow: rgba(255, 132, 63, 0.14);
+  --icon-info: #FF843F;
+  --icon-nav: #FF9F6F;
+}
+
+/* Tsu Contact - tsudev-org/tsucontact | bố cục cong-cu | bo góc tron | hoạ tiết the-xep */
+:root[data-product="contact"] {
+  --text-link: #973069;
+  --primary: #AB437B;
+  --primary-hover: #973069;
+  --primary-active: #841C58;
+  --on-primary: #FFFFFF;
+  --focus-ring: #AB437B;
+  --accent: #8A235E;
+  --glow: rgba(171, 67, 123, 0.1);
+  --icon-info: #AB437B;
+  --icon-nav: #973069;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-control: 999px;
+  --font-display: 'Nunito', var(--font-family);
+}
+:root[data-product="contact"][data-theme="dark"] {
+  --text-link: #F999C8;
+  --primary: #F182BA;
+  --primary-hover: #FD9CCB;
+  --primary-active: #D96CA4;
+  --on-primary: #0A0A0A;
+  --focus-ring: #F182BA;
+  --accent: #FFB7D8;
+  --glow: rgba(241, 130, 186, 0.14);
+  --icon-info: #F182BA;
+  --icon-nav: #F999C8;
+}
+
+/* Tsu Cwico - tsudev-org/tsucwico | bố cục trinh-dien | bo góc sac | hoạ tiết luoi-quet */
+:root[data-product="cwico"] {
+  --text-link: #056270;
+  --primary: #087485;
+  --primary-hover: #056270;
+  --primary-active: #02505C;
+  --on-primary: #FFFFFF;
+  --focus-ring: #087485;
+  --accent: #045460;
+  --glow: rgba(8, 116, 133, 0.1);
+  --icon-info: #087485;
+  --icon-nav: #056270;
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+  --radius-control: 3px;
+  --font-display: 'Be Vietnam Pro', var(--font-family);
+}
+:root[data-product="cwico"][data-theme="dark"] {
+  --text-link: #4AC3DA;
+  --primary: #0EB5CE;
+  --primary-hover: #4EC7DD;
+  --primary-active: #0B9DB3;
+  --on-primary: #0A0A0A;
+  --focus-ring: #0EB5CE;
+  --accent: #7ED9EB;
+  --glow: rgba(14, 181, 206, 0.14);
+  --icon-info: #0EB5CE;
+  --icon-nav: #4AC3DA;
+}
+
+/* TsuDisk - tsudev-org/tsudisk | bố cục cong-cu | bo góc chuan | hoạ tiết khoi-phan-vung */
+:root[data-product="disk"] {
+  --text-link: #016359;
+  --primary: #04776B;
+  --primary-hover: #016359;
+  --primary-active: #045148;
+  --on-primary: #FFFFFF;
+  --focus-ring: #04776B;
+  --accent: #03574E;
+  --glow: rgba(4, 119, 107, 0.1);
+  --icon-info: #04776B;
+  --icon-nav: #016359;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-control: 6px;
+  --font-display: 'Montserrat', var(--font-family);
+}
+:root[data-product="disk"][data-theme="dark"] {
+  --text-link: #5AC6B7;
+  --primary: #24B9A8;
+  --primary-hover: #5ECABA;
+  --primary-active: #0EA292;
+  --on-primary: #0A0A0A;
+  --focus-ring: #24B9A8;
+  --accent: #86DACC;
+  --glow: rgba(36, 185, 168, 0.14);
+  --icon-info: #24B9A8;
+  --icon-nav: #5AC6B7;
+}
+
+/* TsuFiles - tsudev-org/tsufiles | bố cục cong-cu | bo góc mem | hoạ tiết quy-dao */
+:root[data-product="files"] {
+  --text-link: #6D28D9;
+  --primary: #7C3AED;
+  --primary-hover: #6D28D9;
+  --primary-active: #5B21B6;
+  --on-primary: #FFFFFF;
+  --focus-ring: #7C3AED;
+  --accent: #5E28B5;
+  --glow: rgba(124, 58, 237, 0.1);
+  --icon-info: #6D28D9;
+  --icon-nav: #5B21B6;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-control: 10px;
+  --font-display: 'Lexend', var(--font-family);
+}
+:root[data-product="files"][data-theme="dark"] {
+  --text-link: #C4A1FF;
+  --primary: #A970FF;
+  --primary-hover: #BB8CFF;
+  --primary-active: #9A5CF5;
+  --on-primary: #0A0A0A;
+  --focus-ring: #A970FF;
+  --accent: #D8B4FC;
+  --glow: rgba(169, 112, 255, 0.16);
+  --icon-info: #C4A1FF;
+  --icon-nav: #D8B4FC;
+}
+
+/* Lotus Share - tsudev-org/lotus-share | bố cục trinh-dien | bo góc tron | hoạ tiết canh-sen */
+:root[data-product="lotus"] {
+  --text-link: #8D25A3;
+  --primary: #A03BB6;
+  --primary-hover: #8D25A3;
+  --primary-active: #7A0690;
+  --on-primary: #FFFFFF;
+  --focus-ring: #A03BB6;
+  --accent: #811396;
+  --glow: rgba(160, 59, 182, 0.1);
+  --icon-info: #A03BB6;
+  --icon-nav: #8D25A3;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-control: 999px;
+  --font-display: 'Quicksand', var(--font-family);
+}
+:root[data-product="lotus"][data-theme="dark"] {
+  --text-link: #EC98FF;
+  --primary: #E47DFB;
+  --primary-hover: #EC9EFE;
+  --primary-active: #CC67E3;
+  --on-primary: #0A0A0A;
+  --focus-ring: #E47DFB;
+  --accent: #F1B7FF;
+  --glow: rgba(228, 125, 251, 0.14);
+  --icon-info: #E47DFB;
+  --icon-nav: #EC98FF;
+}
+
+/* Quly Thu Chi - tsudev-org/qulythuchi | bố cục bang-dieu-khien | bo góc mem | hoạ tiết cot-tang-truong */
+:root[data-product="qulythuchi"] {
+  --text-link: #056641;
+  --primary: #05794F;
+  --primary-hover: #056641;
+  --primary-active: #005334;
+  --on-primary: #FFFFFF;
+  --focus-ring: #05794F;
+  --accent: #045738;
+  --glow: rgba(5, 121, 79, 0.1);
+  --icon-info: #05794F;
+  --icon-nav: #056641;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-control: 10px;
+  --font-display: 'Be Vietnam Pro', var(--font-family);
+}
+:root[data-product="qulythuchi"][data-theme="dark"] {
+  --text-link: #63C795;
+  --primary: #39BA81;
+  --primary-hover: #67CA98;
+  --primary-active: #12A46C;
+  --on-primary: #0A0A0A;
+  --focus-ring: #39BA81;
+  --accent: #8DDBB1;
+  --glow: rgba(57, 186, 129, 0.14);
+  --icon-info: #39BA81;
+  --icon-nav: #63C795;
+}
+
+/* Sound Db - tsudev-org/sound-db | bố cục do-luong | bo góc chuan | hoạ tiết song-am */
+:root[data-product="sounddb"] {
+  --text-link: #3E6102;
+  --primary: #4B7403;
+  --primary-hover: #3E6102;
+  --primary-active: #324F01;
+  --on-primary: #FFFFFF;
+  --focus-ring: #4B7403;
+  --accent: #365501;
+  --glow: rgba(75, 116, 3, 0.1);
+  --icon-info: #4B7403;
+  --icon-nav: #3E6102;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-control: 6px;
+  --font-display: 'Space Grotesk', var(--font-family);
+}
+:root[data-product="sounddb"][data-theme="dark"] {
+  --text-link: #92C35B;
+  --primary: #7DB530;
+  --primary-hover: #95C65E;
+  --primary-active: #699F08;
+  --on-primary: #0A0A0A;
+  --focus-ring: #7DB530;
+  --accent: #AFD985;
+  --glow: rgba(125, 181, 48, 0.14);
+  --icon-info: #7DB530;
+  --icon-nav: #92C35B;
+}
+
+/* Tsu Swico - tsudev-org/tsuswico | bố cục cong-cu | bo góc sac | hoạ tiết mach-in */
+:root[data-product="swico"] {
+  --text-link: #7E4D00;
+  --primary: #955C04;
+  --primary-hover: #7E4D00;
+  --primary-active: #683E02;
+  --on-primary: #FFFFFF;
+  --focus-ring: #955C04;
+  --accent: #6F4302;
+  --glow: rgba(149, 92, 4, 0.1);
+  --icon-info: #955C04;
+  --icon-nav: #7E4D00;
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+  --radius-control: 3px;
+  --font-display: 'Space Grotesk', var(--font-family);
+}
+:root[data-product="swico"][data-theme="dark"] {
+  --text-link: #EDA756;
+  --primary: #E49324;
+  --primary-hover: #F0AA59;
+  --primary-active: #CB7E04;
+  --on-primary: #0A0A0A;
+  --focus-ring: #E49324;
+  --accent: #FCC181;
+  --glow: rgba(228, 147, 36, 0.14);
+  --icon-info: #E49324;
+  --icon-nav: #EDA756;
+}
+
+/* Tsu Tramon - tsudev-org/tsutramon | bố cục trinh-dien | bo góc mem | hoạ tiết duong-bieu-do */
+:root[data-product="trafficmonitor"] {
+  --text-link: #5F5901;
+  --primary: #716A04;
+  --primary-hover: #5F5901;
+  --primary-active: #4D4803;
+  --on-primary: #FFFFFF;
+  --focus-ring: #716A04;
+  --accent: #534E00;
+  --glow: rgba(113, 106, 4, 0.1);
+  --icon-info: #716A04;
+  --icon-nav: #5F5901;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-control: 10px;
+  --font-display: 'JetBrains Mono', var(--font-family);
+}
+:root[data-product="trafficmonitor"][data-theme="dark"] {
+  --text-link: #C0B84F;
+  --primary: #B3A90F;
+  --primary-hover: #C4BC52;
+  --primary-active: #9C9309;
+  --on-primary: #0A0A0A;
+  --focus-ring: #B3A90F;
+  --accent: #D4CF7C;
+  --glow: rgba(179, 169, 15, 0.14);
+  --icon-info: #B3A90F;
+  --icon-nav: #C0B84F;
+}
+
+/* TsuDEV - tsudev-org/tsudev | bố cục cong | bo góc chuan | hoạ tiết quang-sang */
+:root[data-product="tsudev"] {
+  --text-link: #0757A3;
+  --primary: #0868C4;
+  --primary-hover: #0757A3;
+  --primary-active: #064785;
+  --on-primary: #FFFFFF;
+  --focus-ring: #0868C4;
+  --accent: #0D6E89;
+  --glow: rgba(8, 104, 196, 0.1);
+  --icon-info: #0369A1;
+  --icon-nav: #0757A3;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-control: 6px;
+  --font-display: 'Be Vietnam Pro', var(--font-family);
+}
+:root[data-product="tsudev"][data-theme="dark"] {
+  --text-link: #7DD3FC;
+  --primary: #38BDF8;
+  --primary-hover: #7DD3FC;
+  --primary-active: #0EA5E9;
+  --on-primary: #0A0A0A;
+  --focus-ring: #38BDF8;
+  --accent: #3B9EFF;
+  --glow: rgba(56, 189, 248, 0.14);
+  --icon-info: #60A5FA;
+  --icon-nav: #7DD3FC;
+}

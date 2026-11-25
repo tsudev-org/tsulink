@@ -1,0 +1,6 @@
+# Sinh tự động bởi scripts/sync-standards.sh - KHÔNG sửa tay.
+repo=tsudev-org/tsudev-standards
+ref=v7.0.0
+version=7.0.0
+commit=6ff6ab33515cf5458fa39598df0717294b03e08f
+synced_at=23:01 25/11/2026

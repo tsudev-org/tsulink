@@ -1,0 +1,14 @@
+Tsu Link (tsulink)
+Copyright 2026 tsudev
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+This project reuses the Lotus v2 protocol design of Lotus Share (https://github.com/tsudev-org/lotus-share), a fork of
+LocalSend (https://github.com/localsend/localsend), Copyright LocalSend contributors, licensed under the Apache License,
+Version 2.0. Code extracted from those projects keeps its original copyright notices.
+
+conformance/tsubak-vectors-v1.json and conformance/verify_libsodium.py come from tsusync (TsuDEV Sync), Copyright 2026
+tsudev, relicensed by the copyright holder under Apache-2.0 for this project.
+
+The name "tsudev" / "TsuDEV" and its logos are not licensed under the Apache License and may not be used to endorse or
+promote derived products without prior written permission.

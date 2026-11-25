@@ -1,0 +1,150 @@
+{
+  "$schema": "./design-tokens.schema.json",
+  "meta": {
+    "name": "tsudev-design-tokens",
+    "version": "4.0.0",
+    "updated": "25/11/2026",
+    "source": "https://github.com/tsudev-org/tsudev-standards",
+    "note": "Nguồn chân lý duy nhất cho giao diện toàn hệ sinh thái TsuDEV. Hai lớp: color.* là LỚP NỀN CHUNG (nền đen tuyền/trắng, chữ, viền, trạng thái) kèm bộ vai trò nhấn mặc định của TsuDEV; tokens/products/<id>.json là LỚP BẢN SẮC của từng sản phẩm (docs/DESIGN_SYSTEM.md mục 1.2). tokens/tokens.css và tokens/products.css là bản SINH RA (node scripts/build-tokens.mjs), không sửa tay."
+  },
+
+  "color": {
+    "light": {
+      "bg-base": "#EEF1F5",
+      "bg-surface": "#F8FAFC",
+      "bg-subtle": "#E9EDF2",
+      "bg-hover": "#E6EAF0",
+      "border": "#D5DBE3",
+      "border-strong": "#C3CBD6",
+      "border-control": "#64748B",
+      "text-primary": "#0A0A0A",
+      "text-secondary": "#334155",
+      "text-muted": "#475569",
+      "text-link": "#0757A3",
+      "primary": "#0868C4",
+      "primary-hover": "#0757A3",
+      "primary-active": "#064785",
+      "on-primary": "#FFFFFF",
+      "focus-ring": "#0868C4",
+      "accent": "#0D6E89",
+      "glow": "rgba(8, 104, 196, 0.1)",
+      "icon-info": "#0369A1",
+      "icon-nav": "#0757A3",
+      "success": "#15803D",
+      "warning": "#B45309",
+      "danger": "#DC2626",
+      "info": "#0369A1",
+      "on-status": "#FFFFFF",
+      "overlay": "rgba(10, 10, 10, 0.45)"
+    },
+    "dark": {
+      "bg-base": "#0A0A0A",
+      "bg-surface": "#0F1114",
+      "bg-subtle": "#15181D",
+      "bg-hover": "#1C2027",
+      "border": "#22272F",
+      "border-strong": "#2C323C",
+      "border-control": "#6E6E6E",
+      "text-primary": "#EDEDED",
+      "text-secondary": "#B4B4B4",
+      "text-muted": "#8F8F8F",
+      "text-link": "#7DD3FC",
+      "primary": "#38BDF8",
+      "primary-hover": "#7DD3FC",
+      "primary-active": "#0EA5E9",
+      "on-primary": "#0A0A0A",
+      "focus-ring": "#38BDF8",
+      "accent": "#3B9EFF",
+      "glow": "rgba(56, 189, 248, 0.14)",
+      "icon-info": "#60A5FA",
+      "icon-nav": "#7DD3FC",
+      "success": "#4ADE80",
+      "warning": "#FBBF24",
+      "danger": "#F87171",
+      "info": "#38BDF8",
+      "on-status": "#0A0A0A",
+      "overlay": "rgba(0, 0, 0, 0.6)"
+    }
+  },
+
+  "typography": {
+    "font-family": "'Inter', 'SF Pro Text', 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif",
+    "font-mono": "'JetBrains Mono', 'Cascadia Code', 'Consolas', monospace",
+    "font-size": {
+      "xs": "12px",
+      "sm": "13px",
+      "body-desktop": "14px",
+      "body-desktop-lg": "15px",
+      "body-web": "15px",
+      "body-web-lg": "16px",
+      "h4": "18px",
+      "h3": "20px",
+      "h2": "24px",
+      "h1": "30px"
+    },
+    "line-height": {
+      "heading": "1.3",
+      "body": "1.55",
+      "long": "1.6"
+    },
+    "weight": {
+      "regular": "400",
+      "medium": "500",
+      "semibold": "600",
+      "bold": "700"
+    },
+    "letter-spacing": {
+      "body": "0",
+      "heading": "-0.01em",
+      "caps-label": "0.04em"
+    }
+  },
+
+  "radius": {
+    "none": "0px",
+    "sm": "4px",
+    "md": "6px",
+    "lg": "8px",
+    "control": "6px"
+  },
+
+  "spacing": {
+    "1": "4px",
+    "2": "8px",
+    "3": "12px",
+    "4": "16px",
+    "5": "20px",
+    "6": "24px",
+    "8": "32px",
+    "10": "40px",
+    "12": "48px"
+  },
+
+  "shadow": {
+    "sm": "0 1px 2px rgba(0, 0, 0, 0.06)",
+    "md": "0 2px 8px rgba(0, 0, 0, 0.1)",
+    "lg": "0 8px 24px rgba(0, 0, 0, 0.14)"
+  },
+
+  "z-index": {
+    "dropdown": "1000",
+    "sticky": "1020",
+    "modal-overlay": "1040",
+    "modal": "1050",
+    "toast": "1080",
+    "tooltip": "1090"
+  },
+
+  "motion": {
+    "fast": "120ms",
+    "base": "180ms",
+    "slow": "260ms",
+    "easing": "cubic-bezier(0.2, 0, 0, 1)"
+  },
+
+  "format": {
+    "date": "DD/MM/YYYY",
+    "datetime": "HH:mm DD/MM/YYYY",
+    "version-app": "{ten-app}_{YY}.{M}.{DD}{NN}_{arch}-setup.{ext} - xem docs/DESIGN_SYSTEM.md mục 6"
+  }
+}

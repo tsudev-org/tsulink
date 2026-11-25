@@ -1,0 +1,16 @@
+[package]
+name = "tsulink"
+version = "0.1.0"
+description = "Tsu Link - đồng bộ trực tiếp giữa thiết bị qua mạng nội bộ, không internet (tsudev-standards LOCAL_SYNC.md)"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+base64 = "0.22"
+getrandom = "0.3"
+percent-encoding = "2.3"
+sha2 = "0.10"
+thiserror = "2"
