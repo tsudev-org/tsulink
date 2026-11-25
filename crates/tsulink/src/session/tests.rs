@@ -212,7 +212,7 @@ async fn so_ma_so_mot_ben_tu_choi_thi_khong_ai_luu() {
 
 #[test]
 fn cam_ket_nonce_rang_buoc_dung_nonce() {
-    let n = [1u8; 16];
+    let n = rand16().unwrap();
     let mut m = n;
     m[15] ^= 1;
     assert_ne!(commit_of(&n), commit_of(&m));
