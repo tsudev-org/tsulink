@@ -4,6 +4,17 @@ Theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/) và SemVer.
 
 ## [Chưa phát hành]
 
+## [0.4.0] - 26/11/2026
+
+### Thêm
+
+- `session` (TL1 bước 2 / phase P2, ADR-0003): `PairingHost` (`qr_offer`, `accept_qr`, `accept_sas`), `join_qr`,
+  `join_sas`, `SasSession::finish`; ALPN riêng `tsulink-pair/1`; so mã số có cam kết nonce (chống thử nonce của kẻ
+  đứng giữa); `AttemptLimiter` 5 lần sai/10 phút ⇒ khoá 10 phút.
+- `devices`: `DeviceStore`, `InMemoryDeviceStore`, `PinsFromStore` (ghim mTLS đọc thẳng kho), tự gỡ sau 180 ngày.
+- `frame`: khung tin 4 byte độ dài + JSON (≤ 64 KiB).
+- Lỗi mới `Locked`, `PairingRejected`.
+
 ## [0.3.0] - 26/11/2026
 
 ### Thêm

@@ -5,7 +5,7 @@
 
 ## Hàng đợi task (làm từ trên xuống)
 
-- [ ] TL1 bước 2-6 (`logs/handover/20261125-TL1_khoi-tao-tsulink.md`) - kế hoạch phase ở mục "Phase" của phiếu
+- [ ] TL1 phase P4-P6 (bước 3, 5, 6) (`logs/handover/20261125-TL1_khoi-tao-tsulink.md`) - kế hoạch phase ở mục "Phase" của phiếu
 
 ## Đang thực hiện
 
@@ -13,6 +13,8 @@
 | --- | --- | --- |
 
 ## Đã hoàn thành (mới nhất trên cùng)
+
+- 26/11/2026 - TL1-P2, 0.4.0: phiên ghép đôi QR + so mã số có cam kết, khoá 10 phút, kho thiết bị (62 test)
 
 - 26/11/2026 - TL1-P3, 0.3.0: `.tsubak` (ADR-0002), 49 test, `verify_libsodium.py` 36 ca khớp libsodium 1.0.18
 
@@ -25,6 +27,7 @@
 > Quyết định kiến trúc lớn thì viết ADR riêng theo `docs/templates/ADR.md` và chỉ
 > ghi một dòng tham chiếu ở đây.
 
+- 26/11/2026 - Giao thức ghép đôi + cam kết nonce khi so mã số - `docs/adr/0003-phien-ghep-doi.md`
 - 26/11/2026 - Khuôn `.tsubak` bản 1 - `docs/adr/0002-dinh-dang-tsubak.md`
 - 26/11/2026 - Khám phá + mTLS dựng lại theo Lotus v2, không phụ thuộc crate `localsend` - `docs/adr/0001-kham-pha-va-mtls-tu-loi-lotus-v2.md`
 

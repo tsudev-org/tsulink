@@ -1,6 +1,6 @@
 [package]
 name = "tsulink"
-version = "0.3.0"
+version = "0.4.0"
 description = "Tsu Link - đồng bộ trực tiếp giữa thiết bị qua mạng nội bộ, không internet (tsudev-standards LOCAL_SYNC.md)"
 edition.workspace = true
 license.workspace = true

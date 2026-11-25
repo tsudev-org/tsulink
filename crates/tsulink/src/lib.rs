@@ -5,22 +5,27 @@
 //! - [`addr`]: chỉ nhận địa chỉ mạng nội bộ (luật L1);
 //! - [`pairing`]: tạo/đọc URI mã QR `tsulink:1?...`, mã ghép đôi một lần, hạn 120 giây;
 //! - [`sas`]: mã 6 chữ số để hai người so khi không quét được QR;
+//! - [`session`] + [`devices`]: phiên ghép đôi QR/so mã số (cam kết nonce, khoá 10 phút sau 5 lần sai), kho thiết bị;
+//! - [`frame`]: khung tin độ dài + JSON trên luồng mTLS;
 //! - [`identity`]: danh tính thiết bị ECDSA P-256 + vân tay chứng thư;
 //! - [`tls`] + [`transport`]: mTLS 1.3 ghim vân tay hai chiều, ALPN `tsulink/1`, cổng nghe tự đóng (L3, L4);
 //! - [`discovery`]: khám phá multicast dùng chung kênh Lotus v2, thêm trường `tsulink`;
 //! - [`tsubak`]: sao lưu/mang dữ liệu đi bằng tệp `.tsubak` (zip mở, mã hoá tuỳ chọn, vector chéo).
 //!
-//! Phiên ghép đôi, khung đồng bộ CRDT và truyền tệp làm ở các bản sau (phiếu
+//! Khung đồng bộ CRDT và truyền tệp làm ở các bản sau (phiếu
 //! `logs/handover/20261125-TL1_*`). Khám phá và mTLS dựng lại theo lõi Lotus v2 của Lotus Share (ADR-0001).
 
 #![forbid(unsafe_code)]
 #![deny(missing_docs)]
 
 pub mod addr;
+pub mod devices;
 pub mod discovery;
+pub mod frame;
 pub mod identity;
 pub mod pairing;
 pub mod sas;
+pub mod session;
 pub mod tls;
 pub mod transport;
 pub mod tsubak;
@@ -67,6 +72,12 @@ pub enum Error {
     /// Mật khẩu sao lưu quá ngắn (< 10 ký tự sau NFKC).
     #[error("mật khẩu sao lưu cần ít nhất 10 ký tự")]
     WeakPassword,
+    /// Quá 5 lần ghép đôi sai trong 10 phút - khoá tới thời điểm này (giây Unix).
+    #[error("tạm khoá ghép đôi tới {0}")]
+    Locked(u64),
+    /// Bên kia từ chối ghép đôi (mã `t` sai/hết hạn, hoặc so mã số không được xác nhận ở cả hai máy).
+    #[error("ghép đôi bị từ chối")]
+    PairingRejected,
     /// Bên kia không nói đúng giao thức Tsu Link.
     #[error("sai giao thức: {0}")]
     Protocol(&'static str),
