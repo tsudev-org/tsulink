@@ -16,7 +16,7 @@ Chuẩn: tsudev-standards [`docs/LOCAL_SYNC.md`](https://github.com/tsudev-org/t
 | `pairing` - URI mã QR `tsulink:1?...`, mã một lần hạn 120 giây | ✅ 0.1.0 |
 | `sas` - mã 6 chữ số so trên hai máy, vector đối chiếu chéo | ✅ 0.1.0 |
 | `identity`, `tls`, `transport`, `discovery` - danh tính P-256, mTLS 1.3 ghim vân tay, khám phá multicast (theo lõi Lotus v2, ADR-0001) | ✅ 0.2.0 |
-| Phiên ghép đôi (QR/so mã số, khoá 10 phút, kho thiết bị) | ⬜ |
+| `session`, `devices`, `frame` - phiên ghép đôi QR/so mã số (cam kết nonce), khoá 10 phút, kho thiết bị (ADR-0003) | ✅ 0.4.0 |
 | Khung đồng bộ CRDT (Automerge, HLC), truyền tệp khối BLAKE3 | ⬜ |
 | `tsubak` - sao lưu `.tsubak`: zip mở, mã hoá tuỳ chọn `TS 01` (Argon2id + secretstream), vector chéo (ADR-0002) | ✅ 0.3.0 |
 | Ràng buộc Flutter / C ABI (.NET) / Tauri; gói TS `@tsudev/link` | ⬜ |

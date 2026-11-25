@@ -23,6 +23,9 @@ use std::sync::{Arc, RwLock};
 /// Giao thức ứng dụng đàm phán qua ALPN.
 pub const ALPN: &[u8] = b"tsulink/1";
 
+/// ALPN riêng của phiên ghép đôi - kết nối ghép đôi không bao giờ lẫn với kết nối đồng bộ.
+pub const ALPN_PAIR: &[u8] = b"tsulink-pair/1";
+
 /// Lược đồ chữ ký nhận cho chứng thư thiết bị.
 const SCHEMES: [SignatureScheme; 2] = [
     SignatureScheme::ECDSA_NISTP256_SHA256,
@@ -118,7 +121,8 @@ fn rejected() -> rustls::Error {
 
 /// Kiểm chứng thư máy khách: bắt buộc có, vân tay phải thuộc [`PeerPins`].
 struct PinnedClientVerifier {
-    pins: Arc<dyn PeerPins>,
+    /// `None` = phiên ghép đôi: nhận mọi chứng thư (vẫn kiểm chữ ký), xác thực bằng mã `t` hoặc so mã số.
+    pins: Option<Arc<dyn PeerPins>>,
     algs: WebPkiSupportedAlgorithms,
 }
 
@@ -147,7 +151,11 @@ impl ClientCertVerifier for PinnedClientVerifier {
         _intermediates: &[CertificateDer<'_>],
         _now: UnixTime,
     ) -> Result<ClientCertVerified, rustls::Error> {
-        if self.pins.is_paired(&fingerprint_of(end_entity)) {
+        if self
+            .pins
+            .as_ref()
+            .is_none_or(|p| p.is_paired(&fingerprint_of(end_entity)))
+        {
             Ok(ClientCertVerified::assertion())
         } else {
             Err(rejected())
@@ -179,7 +187,8 @@ impl ClientCertVerifier for PinnedClientVerifier {
 
 /// Kiểm chứng thư máy chủ: đúng một vân tay đã ghim, bỏ qua tên máy (gọi theo IP, chứng thư không có SAN).
 struct PinnedServerVerifier {
-    expected: String,
+    /// `None` = so mã số (chưa biết vân tay bên kia; xác thực bằng mã 6 chữ số).
+    expected: Option<String>,
     algs: WebPkiSupportedAlgorithms,
 }
 
@@ -200,7 +209,11 @@ impl ServerCertVerifier for PinnedServerVerifier {
         _ocsp: &[u8],
         _now: UnixTime,
     ) -> Result<ServerCertVerified, rustls::Error> {
-        if fingerprint_of(end_entity) == self.expected {
+        if self
+            .expected
+            .as_ref()
+            .is_none_or(|e| *e == fingerprint_of(end_entity))
+        {
             Ok(ServerCertVerified::assertion())
         } else {
             Err(rejected())
@@ -254,6 +267,19 @@ pub fn server_config(
     identity: &DeviceIdentity,
     pins: Arc<dyn PeerPins>,
 ) -> Result<Arc<ServerConfig>, Error> {
+    build_server(identity, Some(pins), ALPN)
+}
+
+/// Cấu hình máy chủ của phiên ghép đôi: nhận mọi chứng thư máy khách, ALPN [`ALPN_PAIR`].
+pub(crate) fn pairing_server_config(identity: &DeviceIdentity) -> Result<Arc<ServerConfig>, Error> {
+    build_server(identity, None, ALPN_PAIR)
+}
+
+fn build_server(
+    identity: &DeviceIdentity,
+    pins: Option<Arc<dyn PeerPins>>,
+    alpn: &[u8],
+) -> Result<Arc<ServerConfig>, Error> {
     let verifier = Arc::new(PinnedClientVerifier {
         pins,
         algs: algorithms(),
@@ -264,7 +290,7 @@ pub fn server_config(
         .with_client_cert_verifier(verifier)
         .with_single_cert(cert_chain(identity), key_der(identity))
         .map_err(|_| Error::Identity)?;
-    cfg.alpn_protocols = vec![ALPN.to_vec()];
+    cfg.alpn_protocols = vec![alpn.to_vec()];
     cfg.session_storage = Arc::new(NoServerSessionStorage {});
     cfg.ticketer = Arc::new(NoTickets);
     cfg.send_tls13_tickets = 0;
@@ -280,8 +306,27 @@ pub fn client_config(
     if !crate::is_valid_fingerprint(expected_fp) {
         return Err(Error::BadFingerprint);
     }
+    build_client(identity, Some(expected_fp.to_owned()), ALPN)
+}
+
+/// Cấu hình máy khách của phiên ghép đôi: ghim `expected` (mã QR) hoặc nhận mọi máy chủ (`None`, so mã số).
+pub(crate) fn pairing_client_config(
+    identity: &DeviceIdentity,
+    expected: Option<&str>,
+) -> Result<Arc<ClientConfig>, Error> {
+    if expected.is_some_and(|e| !crate::is_valid_fingerprint(e)) {
+        return Err(Error::BadFingerprint);
+    }
+    build_client(identity, expected.map(str::to_owned), ALPN_PAIR)
+}
+
+fn build_client(
+    identity: &DeviceIdentity,
+    expected: Option<String>,
+    alpn: &[u8],
+) -> Result<Arc<ClientConfig>, Error> {
     let verifier = Arc::new(PinnedServerVerifier {
-        expected: expected_fp.to_owned(),
+        expected,
         algs: algorithms(),
     });
     let mut cfg = ClientConfig::builder_with_provider(provider())
@@ -291,7 +336,7 @@ pub fn client_config(
         .with_custom_certificate_verifier(verifier)
         .with_client_auth_cert(cert_chain(identity), key_der(identity))
         .map_err(|_| Error::Identity)?;
-    cfg.alpn_protocols = vec![ALPN.to_vec()];
+    cfg.alpn_protocols = vec![alpn.to_vec()];
     cfg.resumption = rustls::client::Resumption::disabled();
     cfg.enable_early_data = false;
     Ok(Arc::new(cfg))

@@ -38,7 +38,7 @@ fn io_err(e: std::io::Error) -> Error {
     Error::Io(e.kind())
 }
 
-fn check_addr(addr: SocketAddr, allow_loopback: bool) -> Result<(), Error> {
+pub(crate) fn check_addr(addr: SocketAddr, allow_loopback: bool) -> Result<(), Error> {
     if is_local_network(addr.ip()) || (allow_loopback && addr.ip().is_loopback()) {
         Ok(())
     } else {
