@@ -14,6 +14,8 @@
 
 ## Đã hoàn thành (mới nhất trên cùng)
 
+- 26/11/2026 - TL1-P3, 0.3.0: `.tsubak` (ADR-0002), 49 test, `verify_libsodium.py` 36 ca khớp libsodium 1.0.18
+
 - 26/11/2026 - TL1 bước 1, 0.2.0: danh tính P-256, mTLS 1.3 ghim, cổng nghe L1/L4, khám phá multicast Lotus v2 (29 test)
 
 - 25/11/2026 - Khởi tạo repo, 0.1.0: `addr`, `pairing`, `sas` + vector, CI
@@ -23,6 +25,7 @@
 > Quyết định kiến trúc lớn thì viết ADR riêng theo `docs/templates/ADR.md` và chỉ
 > ghi một dòng tham chiếu ở đây.
 
+- 26/11/2026 - Khuôn `.tsubak` bản 1 - `docs/adr/0002-dinh-dang-tsubak.md`
 - 26/11/2026 - Khám phá + mTLS dựng lại theo Lotus v2, không phụ thuộc crate `localsend` - `docs/adr/0001-kham-pha-va-mtls-tu-loi-lotus-v2.md`
 
 ## Sự cố bảo mật

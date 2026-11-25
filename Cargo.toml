@@ -14,3 +14,7 @@ lto = "fat"
 codegen-units = 1
 panic = "abort"
 debug = false
+
+# Argon2id 64 MiB ở chế độ debug chậm hàng chục giây - tối ưu phụ thuộc cả khi chạy test.
+[profile.dev.package."*"]
+opt-level = 3

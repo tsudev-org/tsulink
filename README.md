@@ -18,7 +18,7 @@ Chuẩn: tsudev-standards [`docs/LOCAL_SYNC.md`](https://github.com/tsudev-org/t
 | `identity`, `tls`, `transport`, `discovery` - danh tính P-256, mTLS 1.3 ghim vân tay, khám phá multicast (theo lõi Lotus v2, ADR-0001) | ✅ 0.2.0 |
 | Phiên ghép đôi (QR/so mã số, khoá 10 phút, kho thiết bị) | ⬜ |
 | Khung đồng bộ CRDT (Automerge, HLC), truyền tệp khối BLAKE3 | ⬜ |
-| Sao lưu `.tsubak` (vector ở `conformance/tsubak-vectors-v1.json`) | ⬜ |
+| `tsubak` - sao lưu `.tsubak`: zip mở, mã hoá tuỳ chọn `TS 01` (Argon2id + secretstream), vector chéo (ADR-0002) | ✅ 0.3.0 |
 | Ràng buộc Flutter / C ABI (.NET) / Tauri; gói TS `@tsudev/link` | ⬜ |
 
 Lộ trình: [`logs/handover/20261125-TL1_khoi-tao-tsulink.md`](logs/handover/20261125-TL1_khoi-tao-tsulink.md).

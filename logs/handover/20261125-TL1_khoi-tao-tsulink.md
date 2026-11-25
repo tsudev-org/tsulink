@@ -25,8 +25,8 @@
 | Phase | Nội dung | Phụ thuộc | Ước lượng |
 | --- | --- | --- | --- |
 | TL1-P1 ✅ | Bước 1 - danh tính, mTLS, khám phá (0.2.0) | - | xong 26/11 |
-| TL1-P2 | Bước 2 - phiên ghép đôi: cổng chế độ ghép đôi nhận mọi chứng thư nhưng chỉ đổi lấy mã `t` một lần; SAS qua `sas::code`; khoá 10 phút sau 5 lần sai; trait kho thiết bị đã ghép đôi + tự gỡ 180 ngày (0.3.0) | P1 | 1 phiên |
-| TL1-P3 | Bước 4 - `.tsubak` (độc lập P2, làm song song được): zip + secretstream + Argon2id, khớp `tsubak-vectors-v1.json` (0.4.0) | - | 1 phiên |
+| TL1-P2 | Bước 2 - phiên ghép đôi: cổng chế độ ghép đôi nhận mọi chứng thư nhưng chỉ đổi lấy mã `t` một lần; SAS qua `sas::code`; khoá 10 phút sau 5 lần sai; trait kho thiết bị đã ghép đôi + tự gỡ 180 ngày (0.4.0) | P1 | 1 phiên |
+| TL1-P3 ✅ | Bước 4 - `.tsubak` (độc lập P2, làm song song được): zip + secretstream + Argon2id, khớp `tsubak-vectors-v1.json` (làm thành 0.3.0) | - | xong 26/11 |
 | TL1-P4 | Bước 3 - khung đồng bộ: khung tin có độ dài, bắt tay `schema_version`, HLC + LWW + bia mộ, Automerge sync, tệp khối 1 MiB BLAKE3 nối lại (0.5.0) | P2 | 1-2 phiên |
 | TL1-P5 | Bước 5 - ràng buộc `flutter_rust_bridge` + C ABI (.NET) (0.6.0); `@tsudev/link` WebRTC host-only là thử nghiệm riêng | P4 | 1-2 phiên |
 | TL1-P6 | Bước 6 - test mục 10 LOCAL_SYNC đầy đủ + thử thật Android ↔ Windows (👤) ⇒ báo điều phối, qulythuchi pilot | P5 | 1 phiên + 👤 |
@@ -37,3 +37,4 @@ Lệnh khởi động phiên: "Đọc AGENTS.md, logs/STATE.md, phiếu `logs/ha
 
 - 25/11/2026 - projects-05: tạo repo (chủ dự án cho phép), 0.1.0, CI.
 - 26/11/2026 - projects-82 (điều phối): bước 1 xong - 0.2.0 (`identity`, `tls`, `transport`, `discovery`, ADR-0001, 29 test); thêm Dependabot + sửa miễn gitleaks (PR #1).
+- 26/11/2026 - projects-82: TL1-P3 xong - 0.3.0 `.tsubak` (ADR-0002, 49 test, libsodium C khớp 36 ca). P2 (ghép đôi) là phase kế tiếp.
