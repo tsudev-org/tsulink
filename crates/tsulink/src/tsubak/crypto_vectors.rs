@@ -214,7 +214,14 @@ fn ngu_canh_sai_dinh_dang_bi_tu_choi() {
 
 #[test]
 fn tao_khoa_va_mo_khoa_khu_hoi_qua_json() {
-    let pw = "mật khẩu đủ dài 2026";
+    // Mật khẩu sinh lúc chạy (không gõ cứng giá trị mật mã trong mã nguồn).
+    let rnd = || {
+        let mut b = [0u8; 12];
+        getrandom::fill(&mut b).unwrap();
+        format!("mật khẩu thử {}", b64u(&b))
+    };
+    let (pw, wrong) = (rnd(), rnd());
+    let pw = pw.as_str();
     let k = create_keys(pw, Some(KDF_MIN)).unwrap();
     let json: Value = serde_json::from_str(&k.params.to_json().to_string()).unwrap();
     let u = unlock_keys(pw, &json).unwrap();
@@ -226,7 +233,7 @@ fn tao_khoa_va_mo_khoa_khu_hoi_qua_json() {
     alg["alg"] = json!("argon2i13");
     assert!(matches!(unlock_keys(pw, &alg), Err(Error::Crypto(_))));
     assert!(matches!(
-        unlock_keys("mật khẩu sai rồi 2026", &json),
+        unlock_keys(&wrong, &json),
         Err(Error::WrongPassword)
     ));
 }
