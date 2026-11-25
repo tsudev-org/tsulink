@@ -7,9 +7,10 @@
 //! - [`sas`]: mã 6 chữ số để hai người so khi không quét được QR;
 //! - [`identity`]: danh tính thiết bị ECDSA P-256 + vân tay chứng thư;
 //! - [`tls`] + [`transport`]: mTLS 1.3 ghim vân tay hai chiều, ALPN `tsulink/1`, cổng nghe tự đóng (L3, L4);
-//! - [`discovery`]: khám phá multicast dùng chung kênh Lotus v2, thêm trường `tsulink`.
+//! - [`discovery`]: khám phá multicast dùng chung kênh Lotus v2, thêm trường `tsulink`;
+//! - [`tsubak`]: sao lưu/mang dữ liệu đi bằng tệp `.tsubak` (zip mở, mã hoá tuỳ chọn, vector chéo).
 //!
-//! Phiên ghép đôi, khung đồng bộ CRDT, truyền tệp và `.tsubak` làm ở các bản sau (phiếu
+//! Phiên ghép đôi, khung đồng bộ CRDT và truyền tệp làm ở các bản sau (phiếu
 //! `logs/handover/20261125-TL1_*`). Khám phá và mTLS dựng lại theo lõi Lotus v2 của Lotus Share (ADR-0001).
 
 #![forbid(unsafe_code)]
@@ -22,6 +23,7 @@ pub mod pairing;
 pub mod sas;
 pub mod tls;
 pub mod transport;
+pub mod tsubak;
 
 /// Lỗi của Tsu Link.
 #[derive(Debug, thiserror::Error, PartialEq, Eq)]
@@ -56,6 +58,15 @@ pub enum Error {
     /// Cổng nghe không có kết nối mới trong 10 phút - app phải đóng cổng (luật L4).
     #[error("cổng nghe hết thời gian chờ")]
     IdleTimeout,
+    /// Tệp sao lưu `.tsubak` hỏng, bị sửa, không an toàn hoặc không khớp app.
+    #[error("sao lưu: {0}")]
+    Backup(&'static str),
+    /// Mật khẩu sao lưu sai (hoặc thiếu khi tệp có mã hoá).
+    #[error("mật khẩu sao lưu không đúng")]
+    WrongPassword,
+    /// Mật khẩu sao lưu quá ngắn (< 10 ký tự sau NFKC).
+    #[error("mật khẩu sao lưu cần ít nhất 10 ký tự")]
+    WeakPassword,
     /// Bên kia không nói đúng giao thức Tsu Link.
     #[error("sai giao thức: {0}")]
     Protocol(&'static str),

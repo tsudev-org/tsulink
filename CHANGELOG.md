@@ -4,6 +4,16 @@ Theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/) và SemVer.
 
 ## [Chưa phát hành]
 
+## [0.3.0] - 26/11/2026
+
+### Thêm
+
+- `tsubak` (TL1 bước 4 / phase P3, ADR-0002): `export`, `inspect`, `import`, `write_atomic`. Zip định dạng mở +
+  `tsubak.json` (SHA-256 từng tệp); mã hoá tuỳ chọn = `TS 01` của TsuDEV Sync (libsodium secretstream
+  XChaCha20-Poly1305, Argon2id 64 MiB/3 lượt, NFKC) - qua 36 ca `conformance/tsubak-vectors-v1.json` và libsodium C.
+  Chống zip bom, đường dẫn thoát thư mục, tệp lạ; sai mật khẩu ⇒ lỗi rõ.
+- Lỗi mới `Backup`, `WrongPassword`, `WeakPassword`.
+
 ## [0.2.0] - 26/11/2026
 
 ### Thêm
