@@ -4,6 +4,26 @@ Theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/) và SemVer.
 
 ## [Chưa phát hành]
 
+## [0.5.0] - 26/11/2026
+
+### Thêm
+
+- `sync` (TL1 bước 3 / phase P4, ADR-0004): `handshake` (trao `proto`/`app`/`schema_version`, khác lược đồ ⇒ dừng),
+  `pull_rows`/`serve_rows`, `sync_docs` (giao thức đồng bộ Automerge 0.12), `fetch_file`/`serve_files`/`finish_files`,
+  `run` (trọn một phiên) + `SyncReport`.
+- `sync::hlc`: `Hlc`, `Clock` (từ chối mốc nhanh hơn quá 1 giờ).
+- `sync::table`: `Row`, `Cursor`, trait `RowStore` + `InMemoryRowStore`, `Replica` (LWW theo HLC, bia mộ, gộp
+  idempotent, con trỏ theo nhật ký bên gửi nên không sót phiên bản đến muộn qua máy thứ ba, xoá bia mộ sau 180 ngày).
+- `sync::file`: `Manifest`, `Receiver` - khối 1 MiB BLAKE3, nối lại từ khối thiếu/hỏng đầu tiên, `fsync` + đổi tên
+  nguyên tử khi đủ và khớp BLAKE3 toàn tệp.
+- `frame`: khung nhị phân/JSON lớn có giới hạn (`write_bytes`, `read_bytes`, `write_json_max`, `read_json_max`,
+  trần `MAX_BLOB` 32 MiB).
+- Lỗi mới `SchemaMismatch`, `ClockSkew`, `Corrupt`. Phụ thuộc mới: `automerge` 0.12.0 (MIT), `blake3` 1.8.7.
+
+### Đổi
+
+- `.standards` v7.0.0 → v7.1.1.
+
 ## [0.4.0] - 26/11/2026
 
 ### Thêm
