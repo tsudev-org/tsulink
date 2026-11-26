@@ -28,7 +28,7 @@
 | TL1-P2 ✅ | Bước 2 - phiên ghép đôi: cổng chế độ ghép đôi nhận mọi chứng thư nhưng chỉ đổi lấy mã `t` một lần; SAS qua `sas::code`; khoá 10 phút sau 5 lần sai; trait kho thiết bị đã ghép đôi + tự gỡ 180 ngày (0.4.0) | P1 | 1 phiên |
 | TL1-P3 ✅ | Bước 4 - `.tsubak` (độc lập P2, làm song song được): zip + secretstream + Argon2id, khớp `tsubak-vectors-v1.json` (làm thành 0.3.0) | - | xong 26/11 |
 | TL1-P4 ✅ | Bước 3 - khung đồng bộ: khung tin có độ dài, bắt tay `schema_version`, HLC + LWW + bia mộ, Automerge sync, tệp khối 1 MiB BLAKE3 nối lại (0.5.0) | P2 | xong 26/11 |
-| TL1-P5 | Bước 5 - ràng buộc `flutter_rust_bridge` + C ABI (.NET) (0.6.0); `@tsudev/link` WebRTC host-only là thử nghiệm riêng | P4 | 1-2 phiên |
+| TL1-P5 ✅ | Bước 5 - ràng buộc `flutter_rust_bridge` + C ABI (.NET) (0.6.0); `@tsudev/link` WebRTC host-only là thử nghiệm riêng | P4 | xong 26/11 |
 | TL1-P6 | Bước 6 - test mục 10 LOCAL_SYNC đầy đủ + thử thật Android ↔ Windows (👤) ⇒ báo điều phối, qulythuchi pilot | P5 | 1 phiên + 👤 |
 
 Lệnh khởi động phiên: "Đọc AGENTS.md, logs/STATE.md, phiếu `logs/handover/20261125-TL1_*` rồi làm phase TL1-P<n>".
@@ -40,3 +40,11 @@ Lệnh khởi động phiên: "Đọc AGENTS.md, logs/STATE.md, phiếu `logs/ha
 - 26/11/2026 - projects-82: TL1-P3 xong - 0.3.0 `.tsubak` (ADR-0002, 49 test, libsodium C khớp 36 ca). P2 (ghép đôi) là phase kế tiếp.
 - 26/11/2026 - projects-82: TL1-P2 xong - 0.4.0 (ADR-0003: ALPN `tsulink-pair/1`, so mã số có cam kết nonce). Kế tiếp P4 (khung đồng bộ).
 - 26/11/2026 - projects-e8: TL1-P4 xong - 0.5.0 (PR #7, ADR-0004: bắt tay `schema_version`, LWW/HLC + bia mộ, con trỏ theo `seq` nhật ký bên gửi, Automerge 0.12, tệp khối 1 MiB BLAKE3 nối lại; 87 test; `.standards` v7.1.1). Kế tiếp P5 (`flutter_rust_bridge` + C ABI bọc `sync::run` + `Replica`). Đề xuất cho LOCAL_SYNC bản sau: ghi con trỏ `seq` + ngưỡng lệch giờ 1 giờ (ADR-0004 Hệ quả).
+- 26/11/2026 - projects-02: TL1-P5 xong - 0.6.0 (PR #9, ADR-0005): mặt tiền `node` (kho đĩa `store` do lõi giữ - frb
+  không gọi ngược Dart đồng bộ được nên KHÔNG để app cấp `RowStore` qua callback; app chép ra kho mình bằng
+  `changes_after`), C ABI `crates/tsulink-capi` + `include/tsulink.h` + .NET `bindings/dotnet/Tsudev.Link`, plugin
+  Flutter `bindings/dart` (gói `tsulink`, frb 2.13.0, ref `v0.6.0`). Trait kho trả `Result` (phá vỡ). Sửa
+  `Receiver::push` thiếu `flush`. Gộp Dependabot #2, #3. `.standards` v7.2.0. Kế tiếp: (a) tsudev-ui-flutter màn "Đồng bộ
+  thiết bị" dùng `bindings/dart`; (b) P6 - dựng thật plugin Android/Windows (cargokit chưa chạy ngoài Linux) + test mục 10
+  + thử Android ↔ Windows (👤). Ghi nhớ P6: `fsync` từng phiên bản - đo lô 512 bản ghi trên điện thoại; bộ đếm sai ghép
+  đôi chỉ trong bộ nhớ.
