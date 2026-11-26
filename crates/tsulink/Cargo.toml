@@ -10,17 +10,17 @@ publish = false
 
 [dependencies]
 automerge = "0.12.0"
-base64 = "0.22"
+base64 = "0.23"
 blake3 = "1.8.7"
 dryoc = { version = "=2.0.1", default-features = false, features = ["std"] }
-getrandom = "0.3"
+getrandom = "0.4"
 if-addrs = "0.15.0"
 percent-encoding = "2.3"
 rcgen = { version = "0.14.10", default-features = false, features = ["crypto", "ring"] }
 rustls = { version = "0.23.46", default-features = false, features = ["ring", "std"] }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.154"
-sha2 = "0.10"
+sha2 = "0.11"
 socket2 = "0.6.5"
 thiserror = "2"
 tokio = { version = "1.54.1", features = ["net", "time", "rt", "io-util", "sync", "fs"] }
