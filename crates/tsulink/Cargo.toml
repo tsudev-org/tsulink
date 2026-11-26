@@ -1,6 +1,6 @@
 [package]
 name = "tsulink"
-version = "0.4.0"
+version = "0.5.0"
 description = "Tsu Link - đồng bộ trực tiếp giữa thiết bị qua mạng nội bộ, không internet (tsudev-standards LOCAL_SYNC.md)"
 edition.workspace = true
 license.workspace = true
@@ -9,7 +9,9 @@ rust-version.workspace = true
 publish = false
 
 [dependencies]
+automerge = "0.12.0"
 base64 = "0.22"
+blake3 = "1.8.7"
 dryoc = { version = "=2.0.1", default-features = false, features = ["std"] }
 getrandom = "0.3"
 if-addrs = "0.15.0"
@@ -21,7 +23,7 @@ serde_json = "1.0.154"
 sha2 = "0.10"
 socket2 = "0.6.5"
 thiserror = "2"
-tokio = { version = "1.54.1", features = ["net", "time", "rt", "io-util", "sync"] }
+tokio = { version = "1.54.1", features = ["net", "time", "rt", "io-util", "sync", "fs"] }
 tokio-rustls = { version = "0.26.6", default-features = false, features = ["ring"] }
 unicode-normalization = "0.1.26"
 zeroize = "1.9.2"

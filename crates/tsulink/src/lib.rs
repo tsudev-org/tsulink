@@ -10,10 +10,12 @@
 //! - [`identity`]: danh tính thiết bị ECDSA P-256 + vân tay chứng thư;
 //! - [`tls`] + [`transport`]: mTLS 1.3 ghim vân tay hai chiều, ALPN `tsulink/1`, cổng nghe tự đóng (L3, L4);
 //! - [`discovery`]: khám phá multicast dùng chung kênh Lotus v2, thêm trường `tsulink`;
-//! - [`tsubak`]: sao lưu/mang dữ liệu đi bằng tệp `.tsubak` (zip mở, mã hoá tuỳ chọn, vector chéo).
+//! - [`tsubak`]: sao lưu/mang dữ liệu đi bằng tệp `.tsubak` (zip mở, mã hoá tuỳ chọn, vector chéo);
+//! - [`sync`]: khung đồng bộ - bắt tay `schema_version`, bảng LWW theo HLC + bia mộ, Automerge, tệp khối 1 MiB BLAKE3
+//!   nối lại (ADR-0004).
 //!
-//! Khung đồng bộ CRDT và truyền tệp làm ở các bản sau (phiếu
-//! `logs/handover/20261125-TL1_*`). Khám phá và mTLS dựng lại theo lõi Lotus v2 của Lotus Share (ADR-0001).
+//! Ràng buộc Flutter/C ABI làm ở các bản sau (phiếu `logs/handover/20261125-TL1_*`). Khám phá và mTLS dựng lại theo
+//! lõi Lotus v2 của Lotus Share (ADR-0001).
 
 #![forbid(unsafe_code)]
 #![deny(missing_docs)]
@@ -26,6 +28,7 @@ pub mod identity;
 pub mod pairing;
 pub mod sas;
 pub mod session;
+pub mod sync;
 pub mod tls;
 pub mod transport;
 pub mod tsubak;
@@ -81,6 +84,20 @@ pub enum Error {
     /// Bên kia không nói đúng giao thức Tsu Link.
     #[error("sai giao thức: {0}")]
     Protocol(&'static str),
+    /// Hai thiết bị khác phiên bản lược đồ dữ liệu - dừng đồng bộ, nhắc cập nhật app (luật L5).
+    #[error("khác phiên bản dữ liệu (máy này {local}, máy kia {remote}) - cần cập nhật app")]
+    SchemaMismatch {
+        /// Lược đồ của máy này.
+        local: u32,
+        /// Lược đồ của máy kia.
+        remote: u32,
+    },
+    /// Đồng hồ thiết bị kia nhanh hơn máy này quá 1 giờ - chỉnh giờ rồi đồng bộ lại.
+    #[error("đồng hồ hai thiết bị lệch quá 1 giờ")]
+    ClockSkew,
+    /// Dữ liệu nhận về sai kiểm tra toàn vẹn (BLAKE3).
+    #[error("dữ liệu hỏng: {0}")]
+    Corrupt(&'static str),
 }
 
 /// Kiểm vân tay: SHA-256 chứng thư DER, hex chữ HOA, 64 ký tự (giống Lotus v2 mục 5.1).
