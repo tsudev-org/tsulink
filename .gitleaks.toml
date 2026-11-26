@@ -6,3 +6,12 @@ useDefault = true
 [[allowlists]]
 description = "Vector đối chiếu mật mã công khai (ADR-0003)"
 paths = ['''^conformance/tsubak-vectors-v1\.json$''']
+
+# Mã Dart do flutter_rust_bridge sinh (ADR-0005): so sánh trường `keyPkcs8Der == other.keyPkcs8Der` trong lớp
+# LinkIdentity khớp nhầm luật generic-api-key. Không có giá trị khoá nào trong tệp. CHỈ miễn tên trường đó trong đúng
+# tệp sinh (điều kiện AND).
+[[allowlists]]
+description = "Tên trường keyPkcs8Der trong mã cầu nối sinh tự động"
+condition = "AND"
+paths = ['''^bindings/dart/lib/src/rust/api\.dart$''']
+regexes = ['''keyPkcs8Der''']
