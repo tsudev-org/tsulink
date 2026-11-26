@@ -1,0 +1,26 @@
+[package]
+name = "tsulink-capi"
+version = "0.6.0"
+description = "Tsu Link - C ABI (cho .NET P/Invoke và ngôn ngữ khác) bọc tsulink::node (ADR-0005)"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+publish = false
+
+[lib]
+name = "tsulink"
+# cdylib: .NET/Windows/Linux nạp động; staticlib: liên kết tĩnh; rlib: test Rust gọi thẳng các hàm extern.
+crate-type = ["cdylib", "staticlib", "rlib"]
+
+[dependencies]
+# Lõi đổi tên khi dùng vì thư viện C xuất ra cũng tên `tsulink` (libtsulink.so / tsulink.dll).
+tsulink-core = { package = "tsulink", path = "../tsulink" }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+
+# Crate DUY NHẤT (cùng mã sinh của flutter_rust_bridge) được dùng `unsafe`: biên C trao con trỏ thô. Mọi khối unsafe
+# nằm trong `src/lib.rs`, có chú thích SAFETY; lõi `tsulink` vẫn `forbid(unsafe_code)`.
+[lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+missing_docs = "warn"

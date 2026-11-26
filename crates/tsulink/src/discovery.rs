@@ -91,7 +91,7 @@ impl Announcement {
 }
 
 /// Một thiết bị Tsu Link vừa thấy trên mạng.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct DiscoveredPeer {
     /// Vân tay chứng thư (chưa xác thực - chỉ xác thực khi bắt tay mTLS).
     pub fingerprint: String,

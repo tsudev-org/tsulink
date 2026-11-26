@@ -54,3 +54,72 @@ jobs:
       - run: cargo clippy --locked --all-targets -- -D warnings
       - run: cargo test --locked
       - run: python3 conformance/check_sas_vector.py
+      - name: Header C biên dịch được (C99 + C++)
+        run: |
+          cc -std=c99 -Wall -Wextra -Werror -fsyntax-only -x c crates/tsulink-capi/include/tsulink.h
+          c++ -Wall -Wextra -Werror -fsyntax-only -x c++ crates/tsulink-capi/include/tsulink.h
+
+  dotnet:
+    name: .NET (C ABI, Tsudev.Link)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_NOLOGO: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
+      - name: Cài toolchain ghim trong rust-toolchain.toml
+        run: rustup show active-toolchain || rustup toolchain install
+      - name: Dựng thư viện C (release, như bản phát hành)
+        run: cargo build --locked --release -p tsulink-capi
+      - name: Kiểm thử trọn đường qua P/Invoke (.NET 8 có sẵn trên ảnh runner)
+        working-directory: bindings/dotnet/Tsudev.Link.Smoke
+        run: |
+          set -euo pipefail
+          dotnet --list-sdks
+          TSULINK_NATIVE_DIR="$GITHUB_WORKSPACE/target/release" dotnet run -c Release
+
+  dart:
+    name: Dart/Flutter (flutter_rust_bridge)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      FLUTTER_VERSION: '3.47.8'
+      FLUTTER_COMMIT: '737ba8f885dc774b53b442759999a312c9461e4e'
+      FRB_VERSION: '2.13.0'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
+      - name: Cài toolchain ghim trong rust-toolchain.toml
+        run: rustup show active-toolchain || rustup toolchain install
+      - name: Flutter (ghim tag + commit)
+        run: |
+          set -euo pipefail
+          git clone --depth 1 -b "$FLUTTER_VERSION" https://github.com/flutter/flutter.git "$RUNNER_TEMP/flutter"
+          test "$(git -C "$RUNNER_TEMP/flutter" rev-parse HEAD)" = "$FLUTTER_COMMIT"
+          echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cargo/bin/flutter_rust_bridge_codegen
+          key: frb-${{ runner.os }}-${{ env.FRB_VERSION }}-${{ hashFiles('rust-toolchain.toml') }}
+      - name: Codegen flutter_rust_bridge (ghim phiên bản, --locked)
+        run: |
+          set -euo pipefail
+          if ! flutter_rust_bridge_codegen --version 2>/dev/null | grep -qx "flutter_rust_bridge_codegen ${FRB_VERSION}"; then
+            cargo install flutter_rust_bridge_codegen --version "$FRB_VERSION" --locked --force
+          fi
+      - name: Mã cầu nối sinh ra phải khớp API
+        run: |
+          set -euo pipefail
+          ./scripts/gen-dart-bridge.sh
+          git diff --exit-code -- bindings/dart/lib bindings/dart/rust/src \
+            || { echo "::error::Mã sinh đã cũ - chạy scripts/gen-dart-bridge.sh"; exit 1; }
+      - name: Phân tích Dart
+        working-directory: bindings/dart
+        run: flutter analyze --fatal-infos
+      - name: Kiểm thử trọn đường qua thư viện Rust thật
+        run: |
+          set -euo pipefail
+          cargo build --locked -p tsulink-dart
+          cd bindings/dart && flutter test

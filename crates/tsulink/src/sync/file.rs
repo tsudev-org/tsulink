@@ -200,6 +200,9 @@ impl Receiver {
             return Err(Error::Corrupt("khối sai BLAKE3"));
         }
         self.file.write_all(chunk).await.map_err(io_err)?;
+        // `tokio::fs::File` ghi ở luồng nền: chưa `flush` mà phiên đứt (bỏ `Receiver`) thì khối vừa nhận có thể chưa
+        // xuống tệp dở ⇒ nối lại phải tải lại (test `tep_khoi_blake3_dut_giua_chung...` chập chờn khi máy bận).
+        self.file.flush().await.map_err(io_err)?;
         self.next += 1;
         Ok(())
     }

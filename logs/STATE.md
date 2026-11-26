@@ -5,7 +5,7 @@
 
 ## Hàng đợi task (làm từ trên xuống)
 
-- [ ] TL1 phase P5-P6 (bước 5, 6) (`logs/handover/20261125-TL1_khoi-tao-tsulink.md`) - kế hoạch phase ở mục "Phase" của phiếu
+- [ ] TL1 phase P6 (bước 6: test mục 10 LOCAL_SYNC + thử thật Android ↔ Windows); tsudev-ui-flutter màn "Đồng bộ thiết bị" dùng `bindings/dart` v0.6.0 (`logs/handover/20261125-TL1_khoi-tao-tsulink.md`) - kế hoạch phase ở mục "Phase" của phiếu
 
 ## Đang thực hiện
 
@@ -13,6 +13,8 @@
 | --- | --- | --- |
 
 ## Đã hoàn thành (mới nhất trên cùng)
+
+- 26/11/2026 - TL1-P5, 0.6.0: mặt tiền `node` + kho đĩa `store`, C ABI `tsulink-capi` + .NET `Tsudev.Link`, plugin Flutter `bindings/dart` (frb 2.13.0); sửa `Receiver::push` thiếu `flush`; 100 test Rust + .NET + Dart trọn đường
 
 - 26/11/2026 - TL1-P4, 0.5.0: khung đồng bộ (bắt tay lược đồ, HLC + LWW + bia mộ, Automerge, tệp khối BLAKE3 nối lại), 87 test; `.standards` v7.1.1
 
@@ -28,6 +30,8 @@
 
 > Quyết định kiến trúc lớn thì viết ADR riêng theo `docs/templates/ADR.md` và chỉ
 > ghi một dòng tham chiếu ở đây.
+
+- 26/11/2026 - Ràng buộc qua mặt tiền `node`, kho do lõi giữ trên đĩa, C ABI + flutter_rust_bridge - `docs/adr/0005-rang-buoc-flutter-va-c-abi.md`
 
 - 26/11/2026 - Khung đồng bộ: LWW/HLC, con trỏ theo nhật ký bên gửi, Automerge, tệp khối - `docs/adr/0004-khung-dong-bo.md`
 - 26/11/2026 - Giao thức ghép đôi + cam kết nonce khi so mã số - `docs/adr/0003-phien-ghep-doi.md`

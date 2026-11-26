@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Bọc C ABI của Tsu Link (crates/tsulink-capi, include/tsulink.h) cho .NET - ADR-0005. Không phụ thuộc gói NuGet nào. -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <RootNamespace>Tsudev.Link</RootNamespace>
+    <Version>0.6.0</Version>
+    <Authors>tsudev</Authors>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+</Project>

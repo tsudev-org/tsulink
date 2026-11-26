@@ -2,6 +2,7 @@
 //! trong Cài đặt; thiết bị không đồng bộ quá [`STALE_AFTER_SECS`] tự bị gỡ. [`PinsFromStore`] nối kho vào bộ ghim
 //! mTLS ([`crate::tls::PeerPins`]) nên gỡ thiết bị có hiệu lực ngay ở kết nối kế tiếp.
 
+use crate::Error;
 use crate::tls::PeerPins;
 use std::collections::BTreeMap;
 use std::sync::{Arc, RwLock};
@@ -10,7 +11,7 @@ use std::sync::{Arc, RwLock};
 pub const STALE_AFTER_SECS: u64 = 180 * 24 * 3600;
 
 /// Một thiết bị đã ghép đôi.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct PairedDevice {
     /// Vân tay chứng thư (hex HOA).
     pub fingerprint: String,
@@ -26,10 +27,10 @@ pub struct PairedDevice {
 pub trait DeviceStore: Send + Sync + std::fmt::Debug {
     /// Toàn bộ thiết bị.
     fn list(&self) -> Vec<PairedDevice>;
-    /// Thêm hoặc thay theo vân tay.
-    fn upsert(&self, device: PairedDevice);
+    /// Thêm hoặc thay theo vân tay (ghi bền vững trước khi trả về).
+    fn upsert(&self, device: PairedDevice) -> Result<(), Error>;
     /// Gỡ theo vân tay; trả `true` nếu có.
-    fn remove(&self, fingerprint: &str) -> bool;
+    fn remove(&self, fingerprint: &str) -> Result<bool, Error>;
 
     /// Tìm theo vân tay.
     fn get(&self, fingerprint: &str) -> Option<PairedDevice> {
@@ -39,24 +40,27 @@ pub trait DeviceStore: Send + Sync + std::fmt::Debug {
     }
 
     /// Ghi nhận vừa đồng bộ xong với thiết bị.
-    fn touch(&self, fingerprint: &str, now: u64) {
-        if let Some(mut d) = self.get(fingerprint) {
-            d.last_sync_at = now;
-            self.upsert(d);
+    fn touch(&self, fingerprint: &str, now: u64) -> Result<(), Error> {
+        match self.get(fingerprint) {
+            Some(mut d) => {
+                d.last_sync_at = now;
+                self.upsert(d)
+            }
+            None => Ok(()),
         }
     }
 
     /// Gỡ thiết bị không đồng bộ quá 180 ngày; trả số thiết bị đã gỡ.
-    fn prune_stale(&self, now: u64) -> usize {
+    fn prune_stale(&self, now: u64) -> Result<usize, Error> {
         let stale: Vec<_> = self
             .list()
             .into_iter()
             .filter(|d| now.saturating_sub(d.last_sync_at) > STALE_AFTER_SECS)
             .collect();
         for d in &stale {
-            self.remove(&d.fingerprint);
+            self.remove(&d.fingerprint)?;
         }
-        stale.len()
+        Ok(stale.len())
     }
 }
 
@@ -74,19 +78,21 @@ impl DeviceStore for InMemoryDeviceStore {
             .collect()
     }
 
-    fn upsert(&self, device: PairedDevice) {
+    fn upsert(&self, device: PairedDevice) -> Result<(), Error> {
         self.0
             .write()
             .unwrap_or_else(|e| e.into_inner())
             .insert(device.fingerprint.clone(), device);
+        Ok(())
     }
 
-    fn remove(&self, fingerprint: &str) -> bool {
-        self.0
+    fn remove(&self, fingerprint: &str) -> Result<bool, Error> {
+        Ok(self
+            .0
             .write()
             .unwrap_or_else(|e| e.into_inner())
             .remove(fingerprint)
-            .is_some()
+            .is_some())
     }
 }
 
@@ -116,15 +122,15 @@ mod tests {
     #[test]
     fn them_go_va_tu_go_sau_180_ngay() {
         let s = Arc::new(InMemoryDeviceStore::default());
-        s.upsert(dev('A', 0));
-        s.upsert(dev('B', 0));
+        s.upsert(dev('A', 0)).unwrap();
+        s.upsert(dev('B', 0)).unwrap();
         let pins = PinsFromStore(s.clone());
         assert!(pins.is_paired(&"A".repeat(64)));
-        s.touch(&"B".repeat(64), STALE_AFTER_SECS);
-        assert_eq!(s.prune_stale(STALE_AFTER_SECS + 1), 1);
+        s.touch(&"B".repeat(64), STALE_AFTER_SECS).unwrap();
+        assert_eq!(s.prune_stale(STALE_AFTER_SECS + 1).unwrap(), 1);
         assert!(!pins.is_paired(&"A".repeat(64)), "gỡ có hiệu lực ngay");
         assert!(pins.is_paired(&"B".repeat(64)));
-        assert!(s.remove(&"B".repeat(64)));
+        assert!(s.remove(&"B".repeat(64)).unwrap());
         assert!(s.list().is_empty());
     }
 }

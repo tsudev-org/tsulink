@@ -45,8 +45,10 @@ pub trait RowStore: Send + Sync + std::fmt::Debug {
     fn log_id(&self) -> String;
     /// Phiên bản hiện tại của `(table, key)`, gồm cả bia mộ.
     fn get(&self, table: &str, key: &str) -> Option<Row>;
-    /// Ghi đè phiên bản của `(row.table, row.key)` và gán `seq` mới (lớn hơn mọi `seq` cũ); trả `seq` đó.
-    fn put(&self, row: Row) -> u64;
+    /// Ghi đè phiên bản của `(row.table, row.key)` và gán `seq` mới (lớn hơn mọi `seq` cũ); trả `seq` đó. Phải ghi
+    /// bền vững TRƯỚC khi trả về: phiên bản có thể đã được gửi cho máy khác, mất nó rồi dùng lại `seq` là máy kia bỏ
+    /// sót phiên bản mới mang `seq` đó.
+    fn put(&self, row: Row) -> Result<u64, Error>;
     /// Tối đa `limit` phiên bản có `seq > after`, theo `seq` tăng dần.
     fn changes_after(&self, after: u64, limit: usize) -> Vec<(u64, Row)>;
     /// Mốc HLC lớn nhất trong kho (để [`Clock::resume`]).
@@ -54,9 +56,9 @@ pub trait RowStore: Send + Sync + std::fmt::Debug {
     /// Vị trí đã đọc tới trong nhật ký của thiết bị `peer` (vân tay).
     fn cursor(&self, peer: &str) -> Option<Cursor>;
     /// Lưu vị trí đọc của thiết bị `peer`.
-    fn set_cursor(&self, peer: &str, cursor: Cursor);
+    fn set_cursor(&self, peer: &str, cursor: Cursor) -> Result<(), Error>;
     /// Xoá hẳn bia mộ có mốc nhỏ hơn `before_ms`; trả số bản ghi đã xoá.
-    fn purge_tombstones(&self, before_ms: u64) -> usize;
+    fn purge_tombstones(&self, before_ms: u64) -> Result<usize, Error>;
 }
 
 #[derive(Debug, Default)]
@@ -99,7 +101,7 @@ impl RowStore for InMemoryRowStore {
             .map(|(_, r)| r.clone())
     }
 
-    fn put(&self, row: Row) -> u64 {
+    fn put(&self, row: Row) -> Result<u64, Error> {
         let mut m = self.mem.write().unwrap_or_else(|e| e.into_inner());
         m.next += 1;
         let seq = m.next;
@@ -108,7 +110,7 @@ impl RowStore for InMemoryRowStore {
             m.log.remove(&old);
         }
         m.log.insert(seq, k);
-        seq
+        Ok(seq)
     }
 
     fn changes_after(&self, after: u64, limit: usize) -> Vec<(u64, Row)> {
@@ -130,12 +132,13 @@ impl RowStore for InMemoryRowStore {
         m.cursors.get(peer).cloned()
     }
 
-    fn set_cursor(&self, peer: &str, cursor: Cursor) {
+    fn set_cursor(&self, peer: &str, cursor: Cursor) -> Result<(), Error> {
         let mut m = self.mem.write().unwrap_or_else(|e| e.into_inner());
         m.cursors.insert(peer.to_owned(), cursor);
+        Ok(())
     }
 
-    fn purge_tombstones(&self, before_ms: u64) -> usize {
+    fn purge_tombstones(&self, before_ms: u64) -> Result<usize, Error> {
         let mut m = self.mem.write().unwrap_or_else(|e| e.into_inner());
         let dead: Vec<_> = m
             .rows
@@ -147,7 +150,7 @@ impl RowStore for InMemoryRowStore {
             m.rows.remove(k);
             m.log.remove(s);
         }
-        dead.len()
+        Ok(dead.len())
     }
 }
 
@@ -178,24 +181,36 @@ impl<S: RowStore> Replica<S> {
     }
 
     /// Ghi `value` vào `(table, key)` tại máy này; trả mốc của lần sửa.
-    pub fn write(&self, table: &str, key: &str, value: serde_json::Value, now_ms: u64) -> Hlc {
+    pub fn write(
+        &self,
+        table: &str,
+        key: &str,
+        value: serde_json::Value,
+        now_ms: u64,
+    ) -> Result<Hlc, Error> {
         self.local(table, key, Some(value), now_ms)
     }
 
     /// Xoá `(table, key)` tại máy này (ghi bia mộ); trả mốc.
-    pub fn delete(&self, table: &str, key: &str, now_ms: u64) -> Hlc {
+    pub fn delete(&self, table: &str, key: &str, now_ms: u64) -> Result<Hlc, Error> {
         self.local(table, key, None, now_ms)
     }
 
-    fn local(&self, table: &str, key: &str, value: Option<serde_json::Value>, now_ms: u64) -> Hlc {
+    fn local(
+        &self,
+        table: &str,
+        key: &str,
+        value: Option<serde_json::Value>,
+        now_ms: u64,
+    ) -> Result<Hlc, Error> {
         let hlc = self.clock().tick(now_ms);
         self.store.put(Row {
             table: table.to_owned(),
             key: key.to_owned(),
             hlc: hlc.clone(),
             value,
-        });
-        hlc
+        })?;
+        Ok(hlc)
     }
 
     /// Nội dung hiện tại (`None` nếu chưa có hoặc đã xoá).
@@ -210,14 +225,14 @@ impl<S: RowStore> Replica<S> {
         match self.store.get(&row.table, &row.key) {
             Some(cur) if cur.hlc >= row.hlc => Ok(false),
             _ => {
-                self.store.put(row);
+                self.store.put(row)?;
                 Ok(true)
             }
         }
     }
 
     /// Xoá hẳn bia mộ quá [`TOMBSTONE_TTL_MS`]; trả số bản ghi đã xoá.
-    pub fn purge_tombstones(&self, now_ms: u64) -> usize {
+    pub fn purge_tombstones(&self, now_ms: u64) -> Result<usize, Error> {
         self.store
             .purge_tombstones(now_ms.saturating_sub(TOMBSTONE_TTL_MS))
     }
@@ -242,8 +257,8 @@ mod tests {
     fn hai_may_sua_cung_ban_ghi_ngoai_tuyen_ben_sau_thang_o_ca_hai() {
         let a = replica("A");
         let b = replica("B");
-        a.write("chi", "1", json!({"so_tien": 100}), 1000);
-        b.write("chi", "1", json!({"so_tien": 200}), 2000);
+        a.write("chi", "1", json!({"so_tien": 100}), 1000).unwrap();
+        b.write("chi", "1", json!({"so_tien": 200}), 2000).unwrap();
         copy_all(&a, &b, 3000);
         copy_all(&b, &a, 3000);
         assert_eq!(a.read("chi", "1"), Some(json!({"so_tien": 200})));
@@ -255,16 +270,16 @@ mod tests {
         // Xoá sau ⇒ xoá thắng.
         let a = replica("A");
         let b = replica("B");
-        a.write("chi", "1", json!(1), 1000);
+        a.write("chi", "1", json!(1), 1000).unwrap();
         copy_all(&a, &b, 1000);
-        b.write("chi", "1", json!(2), 2000);
-        a.delete("chi", "1", 3000);
+        b.write("chi", "1", json!(2), 2000).unwrap();
+        a.delete("chi", "1", 3000).unwrap();
         copy_all(&a, &b, 4000);
         copy_all(&b, &a, 4000);
         assert_eq!(a.read("chi", "1"), None);
         assert_eq!(b.read("chi", "1"), None);
         // Sửa sau ⇒ bản ghi sống lại ở cả hai máy.
-        b.write("chi", "1", json!(3), 5000);
+        b.write("chi", "1", json!(3), 5000).unwrap();
         copy_all(&b, &a, 6000);
         assert_eq!(a.read("chi", "1"), Some(json!(3)));
     }
@@ -273,7 +288,7 @@ mod tests {
     fn gop_lap_lai_khong_doi_va_khong_tang_nhat_ky() {
         let a = replica("A");
         let b = replica("B");
-        a.write("t", "k", json!("x"), 10);
+        a.write("t", "k", json!("x"), 10).unwrap();
         copy_all(&a, &b, 10);
         let before = b.store().changes_after(0, usize::MAX);
         copy_all(&a, &b, 10);
@@ -283,9 +298,9 @@ mod tests {
     #[test]
     fn nhat_ky_chi_giu_phien_ban_moi_nhat_va_seq_tang() {
         let a = replica("A");
-        a.write("t", "k", json!(1), 10);
-        a.write("t", "j", json!(1), 10);
-        a.write("t", "k", json!(2), 10);
+        a.write("t", "k", json!(1), 10).unwrap();
+        a.write("t", "j", json!(1), 10).unwrap();
+        a.write("t", "k", json!(2), 10).unwrap();
         let log = a.store().changes_after(0, 10);
         assert_eq!(log.len(), 2);
         assert_eq!(log[1].1.key, "k");
@@ -296,18 +311,20 @@ mod tests {
     #[test]
     fn mo_lai_kho_dong_ho_tiep_noi() {
         let store = InMemoryRowStore::new().unwrap();
-        store.put(Row {
-            table: "t".into(),
-            key: "k".into(),
-            hlc: Hlc {
-                ms: 9_000,
-                c: 4,
-                node: "B".into(),
-            },
-            value: None,
-        });
+        store
+            .put(Row {
+                table: "t".into(),
+                key: "k".into(),
+                hlc: Hlc {
+                    ms: 9_000,
+                    c: 4,
+                    node: "B".into(),
+                },
+                value: None,
+            })
+            .unwrap();
         let r = Replica::new("A", store);
-        let h = r.write("t", "k", json!(1), 1);
+        let h = r.write("t", "k", json!(1), 1).unwrap();
         assert_eq!((h.ms, h.c), (9_000, 5));
         assert_eq!(r.read("t", "k"), Some(json!(1)));
     }
@@ -315,11 +332,11 @@ mod tests {
     #[test]
     fn bia_mo_qua_180_ngay_bi_xoa_han() {
         let a = replica("A");
-        a.delete("t", "cu", 1);
-        a.write("t", "song", json!(1), 2);
+        a.delete("t", "cu", 1).unwrap();
+        a.write("t", "song", json!(1), 2).unwrap();
         let now = TOMBSTONE_TTL_MS + 10;
-        a.delete("t", "moi", now);
-        assert_eq!(a.purge_tombstones(now), 1);
+        a.delete("t", "moi", now).unwrap();
+        assert_eq!(a.purge_tombstones(now).unwrap(), 1);
         assert!(a.store().get("t", "cu").is_none());
         assert!(a.store().get("t", "moi").is_some());
         assert_eq!(a.read("t", "song"), Some(json!(1)));
