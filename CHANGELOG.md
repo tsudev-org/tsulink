@@ -31,6 +31,8 @@ Theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/) và SemVer.
 
 - `sync::file::Receiver::push` không `flush` tệp tokio: đứt kết nối ngay sau một khối có thể làm mất khối đã đếm là
   nhận (nối lại phải tải lại; test nối lại chập chờn khi máy bận).
+- (trong bản) `SyncListener::port`/`PairingHostHandle::port`/`qr_uri` không còn qua khoá mà `serve_one`/`accept_*` giữ
+  suốt lúc chờ (hỏi cổng sau khi bắt đầu chờ treo tới hết 10 phút - bắt ở CI .NET).
 
 ## [0.5.0] - 26/11/2026
 

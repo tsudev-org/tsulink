@@ -386,6 +386,7 @@ impl Node {
         .await?;
         Ok(PairingHostHandle {
             node: self.clone(),
+            port: host.local_addr()?.port(),
             host: Arc::new(Mutex::new(host)),
             offer: Arc::new(std::sync::Mutex::new(None)),
         })
@@ -465,6 +466,7 @@ impl Node {
         .await?;
         Ok(SyncListener {
             node: self.clone(),
+            port: l.local_addr()?.port(),
             inner: Arc::new(Mutex::new(l)),
         })
     }
@@ -569,6 +571,8 @@ pub fn local_ips() -> Vec<IpAddr> {
 #[derive(Debug, Clone)]
 pub struct PairingHostHandle {
     node: Arc<Node>,
+    // Cổng giữ sẵn: `accept_*` giữ khoá `host` suốt lúc chờ, hỏi cổng qua khoá thì treo tới khi chờ xong.
+    port: u16,
     host: Arc<Mutex<PairingHost>>,
     offer: Arc<std::sync::Mutex<Option<PairingOffer>>>,
 }
@@ -576,7 +580,7 @@ pub struct PairingHostHandle {
 impl PairingHostHandle {
     /// Cổng đang nghe.
     pub async fn port(&self) -> Result<u16, Error> {
-        Ok(self.host.lock().await.local_addr()?.port())
+        Ok(self.port)
     }
 
     /// Tạo URI cho mã QR (mã một lần mới, hạn 120 giây). `ips` rỗng ⇒ dùng [`local_ips`].
@@ -585,11 +589,15 @@ impl PairingHostHandle {
         if ips.is_empty() {
             return Err(Error::Io(std::io::ErrorKind::AddrNotAvailable));
         }
-        let offer = self
-            .host
-            .lock()
-            .await
-            .qr_offer(&self.node.cfg.app, &ips, now().0)?;
+        // Không qua khoá `host` (xem trường `port`): tạo mã mới được cả khi đang chờ quét mã cũ.
+        let offer = PairingOffer::new(
+            &self.node.cfg.app,
+            self.node.fingerprint(),
+            ips.iter()
+                .map(|ip| SocketAddr::new(*ip, self.port))
+                .collect(),
+            now().0,
+        )?;
         let uri = offer.to_uri();
         *self.offer.lock().unwrap_or_else(|e| e.into_inner()) = Some(offer);
         Ok(uri)
@@ -696,6 +704,9 @@ impl SasHandle {
 #[derive(Debug, Clone)]
 pub struct SyncListener {
     node: Arc<Node>,
+    // Cổng giữ sẵn: `serve_one` giữ khoá `inner` suốt lúc chờ kết nối (lỗi thật bắt ở CI .NET: hỏi cổng sau khi đã
+    // gọi `serve_one` treo 10 phút).
+    port: u16,
     inner: Arc<Mutex<Listener>>,
 }
 
@@ -711,7 +722,7 @@ pub struct ServedSync {
 impl SyncListener {
     /// Cổng đang nghe.
     pub async fn port(&self) -> Result<u16, Error> {
-        Ok(self.inner.lock().await.local_addr()?.port())
+        Ok(self.port)
     }
 
     /// Chờ một thiết bị đã ghép đôi nối tới rồi đồng bộ trọn một phiên (bên nghe).

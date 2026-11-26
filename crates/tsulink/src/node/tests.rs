@@ -193,8 +193,12 @@ async fn huy_cho_va_tu_choi_thiet_bi_chua_ghep_doi() {
     let l = a.listen(0).await.unwrap();
     let c = CancelToken::new();
     let c2 = c.clone();
-    let t = tokio::spawn(async move { l.serve_one(vec![], None, Some(c2)).await });
+    let l2 = l.clone();
+    let t = tokio::spawn(async move { l2.serve_one(vec![], None, Some(c2)).await });
     tokio::time::sleep(Duration::from_millis(50)).await;
+    // Hỏi cổng khi `serve_one` đang chờ không được treo (lỗi bắt ở CI .NET: treo tới hết 10 phút).
+    let p = tokio::time::timeout(Duration::from_secs(1), l.port()).await;
+    assert!(p.expect("port() treo khi serve_one đang chờ").unwrap() > 0);
     c.cancel();
     assert_eq!(t.await.unwrap().unwrap_err(), Error::Cancelled);
 
@@ -209,6 +213,23 @@ async fn huy_cho_va_tu_choi_thiet_bi_chua_ghep_doi() {
         host.accept_qr(None).await.unwrap_err(),
         Error::InvalidInput("chưa tạo mã QR")
     );
+    // Đang chờ so mã số vẫn hỏi cổng và tạo mã QR mới được.
+    let (h2, c3) = (host.clone(), CancelToken::new());
+    let c4 = c3.clone();
+    let w = tokio::spawn(async move { h2.accept_sas(30, Some(c4)).await });
+    tokio::time::sleep(Duration::from_millis(50)).await;
+    let ip: IpAddr = "192.168.1.2".parse().unwrap();
+    let uri = tokio::time::timeout(Duration::from_secs(1), host.qr_uri(vec![ip]))
+        .await
+        .expect("qr_uri treo khi accept_sas đang chờ")
+        .unwrap();
+    let port = tokio::time::timeout(Duration::from_secs(1), host.port())
+        .await
+        .unwrap()
+        .unwrap();
+    assert!(uri.contains(&format!("192.168.1.2:{port}")), "{uri}");
+    c3.cancel();
+    assert_eq!(w.await.unwrap().unwrap_err(), Error::Cancelled);
     assert_eq!(
         a.write("", "k", json!(1)).unwrap_err(),
         Error::InvalidInput("table")
