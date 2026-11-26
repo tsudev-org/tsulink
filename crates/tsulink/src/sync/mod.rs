@@ -179,7 +179,7 @@ pub async fn pull_rows<S: AsyncRead + AsyncWrite + Unpin, R: RowStore>(
             last = Some(seq);
         }
         if let Some(seq) = last {
-            replica.store().set_cursor(peer, Cursor { log, seq });
+            replica.store().set_cursor(peer, Cursor { log, seq })?;
         }
         if !more {
             return Ok(applied);
@@ -439,7 +439,7 @@ pub struct SyncData<'a, R: RowStore> {
 }
 
 /// Kết quả một phiên.
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize)]
 pub struct SyncReport {
     /// Số phiên bản bản ghi nhận về và đã thắng.
     pub rows: usize,

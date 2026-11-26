@@ -10,5 +10,8 @@ Version 2.0. Code extracted from those projects keeps its original copyright not
 conformance/tsubak-vectors-v1.json and conformance/verify_libsodium.py come from tsusync (TsuDEV Sync), Copyright 2026
 tsudev, relicensed by the copyright holder under Apache-2.0 for this project.
 
+bindings/dart/cargokit is Cargokit (https://github.com/irondash/cargokit), Copyright 2022 Matej Knopp, licensed under
+the MIT License (bindings/dart/cargokit/LICENSE), as vendored by flutter_rust_bridge.
+
 The name "tsudev" / "TsuDEV" and its logos are not licensed under the Apache License and may not be used to endorse or
 promote derived products without prior written permission.

@@ -38,8 +38,8 @@ xuất tại repo `tsudev-standards` theo `.standards/docs/SYNC.md` mục 1.
 
 ### B.1. Repo này là gì
 
-- **Loại**: thư viện (crate Rust, sau này có ràng buộc Flutter/C ABI/Tauri và gói TS `@tsudev/link`)
-- **Stack**: Rust 1.97 (`rust-toolchain.toml`), edition 2024, `#![forbid(unsafe_code)]`
+- **Loại**: thư viện (crate Rust `tsulink` + C ABI `crates/tsulink-capi` + .NET `bindings/dotnet` + plugin Flutter `bindings/dart`; gói TS `@tsudev/link` chưa làm)
+- **Stack**: Rust 1.97 (`rust-toolchain.toml`), edition 2024, lõi `#![forbid(unsafe_code)]` (`unsafe` chỉ ở `tsulink-capi` và mã sinh `frb_generated.rs`); flutter_rust_bridge 2.13.0 + Flutter 3.47.8; .NET 8
 - **Mức phân loại dữ liệu cao nhất**: D3 đi qua (dữ liệu người dùng giữa hai thiết bị) - không lưu, không gửi ra internet
 - **Người liên hệ khi có sự cố**: chủ dự án (qua `SECURITY.md`)
 
@@ -57,6 +57,7 @@ python3 conformance/check_sas_vector.py
 | --- | --- |
 | `crates/tsulink/src/*` | phiên tsulink |
 | `conformance/*` | phiên tsulink - vector chỉ THÊM, không đổi vector đã phát hành |
+| `crates/tsulink-capi/*`, `bindings/*` | phiên tsulink - `bindings/dart/lib/src/rust`, `bindings/dart/rust/src/frb_generated.rs` là mã SINH (`scripts/gen-dart-bridge.sh`) |
 
 ### B.4. Điểm lệch chuẩn đã biết
 
@@ -70,3 +71,7 @@ python3 conformance/check_sas_vector.py
 - Tách code từ `lotus-share/packages/core` ⇒ giữ ghi chú bản quyền LocalSend (Apache-2.0) và cập nhật `NOTICE`.
 - Không thêm phụ thuộc gọi mạng ra ngoài (luật L1); mọi phụ thuộc ghim trong `Cargo.lock`.
 - Lộ trình: `logs/handover/20261125-TL1_khoi-tao-tsulink.md`.
+- Ràng buộc (ADR-0005): đổi API trong `node` ⇒ sửa CẢ `crates/tsulink-capi/src/lib.rs` + `include/tsulink.h` (test
+  `header_khop_ham_xuat` bắt), `bindings/dotnet/Tsudev.Link`, `bindings/dart/rust/src/api` rồi `scripts/gen-dart-bridge.sh`
+  (CI so `git diff`). Mã lỗi `Error::code()` chỉ THÊM. flutter_rust_bridge ghim `=2.13.0` ở crate + pubspec + CI.
+- Test mạng (node, C ABI, .NET, Dart) nối qua địa chỉ mạng nội bộ của máy chạy - KHÔNG nới luật L1 cho loopback.

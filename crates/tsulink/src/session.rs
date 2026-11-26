@@ -290,7 +290,7 @@ impl PairingHost {
                 paired_at: now,
                 last_sync_at: now,
             };
-            store.upsert(dev.clone());
+            store.upsert(dev.clone())?;
             frame::write(
                 &mut s,
                 &Reply {
@@ -427,7 +427,7 @@ pub(crate) async fn join_offer(
             paired_at: now,
             last_sync_at: now,
         };
-        store.upsert(dev.clone());
+        store.upsert(dev.clone())?;
         return Ok(dev);
     }
     Err(last)
@@ -540,7 +540,7 @@ impl SasSession {
             paired_at: now,
             last_sync_at: now,
         };
-        store.upsert(dev.clone());
+        store.upsert(dev.clone())?;
         Ok(dev)
     }
 }

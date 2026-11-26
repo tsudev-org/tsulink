@@ -4,6 +4,34 @@ Theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/) và SemVer.
 
 ## [Chưa phát hành]
 
+## [0.6.0] - 26/11/2026
+
+### Thêm
+
+- Ràng buộc (TL1 bước 5 / phase P5, ADR-0005):
+  - `node`: mặt tiền một thiết bị/một app - `Node::open` (danh tính do app giữ), bảng (`write`/`delete`/`read`/
+    `changes_after`), tài liệu Automerge (`doc_merge`/`doc_save`), kho tệp theo BLAKE3 (`file_import`/`file_path`),
+    ghép đôi (`pairing_host` → `qr_uri`/`accept_qr`/`accept_sas`, `join_qr`, `join_sas`, `SasHandle::finish`), đồng bộ
+    (`sync_with`, `listen` → `serve_one`), khám phá, `CancelToken`, runtime tokio dùng chung, `local_ips`.
+  - `store`: `FileRowStore` (nhật ký nối đuôi `fsync`, cắt dòng dở, viết gọn), `FileDeviceStore`, `write_atomic`.
+  - `crates/tsulink-capi`: C ABI 45 hàm + `include/tsulink.h` (test khớp tên hàm và bảng mã lỗi).
+  - `bindings/dotnet/Tsudev.Link` (net8.0, LibraryImport, tương thích AOT) + kiểm thử trọn đường.
+  - `bindings/dart`: plugin Flutter `tsulink` (flutter_rust_bridge 2.13.0, cargokit) + test trọn đường.
+- `Error::code()` mã ổn định; lỗi mới `Cancelled`, `InvalidInput`, `Closed`.
+- CI: job `.NET` và `Dart/Flutter` (mã sinh phải khớp, analyze, test); biên dịch header C99/C++.
+
+### Đổi
+
+- **Phá vỡ**: `RowStore::put`/`set_cursor`/`purge_tombstones`, `Replica::write`/`delete`/`purge_tombstones`,
+  `DeviceStore::upsert`/`remove`/`touch`/`prune_stale` trả `Result` (kho thật hỏng được thay vì `panic`).
+- `PairedDevice`, `SyncReport`, `DiscoveredPeer` có `Serialize`.
+- `.standards` v7.1.1 → v7.2.0 (thêm `CONTROL_PLANE.md`); phụ thuộc: base64 0.23, sha2 0.11, getrandom (Dependabot #3).
+
+### Sửa
+
+- `sync::file::Receiver::push` không `flush` tệp tokio: đứt kết nối ngay sau một khối có thể làm mất khối đã đếm là
+  nhận (nối lại phải tải lại; test nối lại chập chờn khi máy bận).
+
 ## [0.5.0] - 26/11/2026
 
 ### Thêm

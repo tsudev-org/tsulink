@@ -1,6 +1,6 @@
 [package]
 name = "tsulink"
-version = "0.5.0"
+version = "0.6.0"
 description = "Tsu Link - đồng bộ trực tiếp giữa thiết bị qua mạng nội bộ, không internet (tsudev-standards LOCAL_SYNC.md)"
 edition.workspace = true
 license.workspace = true
@@ -23,7 +23,7 @@ serde_json = "1.0.154"
 sha2 = "0.11"
 socket2 = "0.6.5"
 thiserror = "2"
-tokio = { version = "1.54.1", features = ["net", "time", "rt", "io-util", "sync", "fs"] }
+tokio = { version = "1.54.1", features = ["net", "time", "rt", "rt-multi-thread", "io-util", "sync", "fs", "macros"] }
 tokio-rustls = { version = "0.26.6", default-features = false, features = ["ring"] }
 unicode-normalization = "0.1.26"
 zeroize = "1.9.2"

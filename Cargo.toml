@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["crates/tsulink"]
+members = ["crates/tsulink", "crates/tsulink-capi", "bindings/dart/rust"]
 
 [workspace.package]
 edition = "2024"

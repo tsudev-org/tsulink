@@ -112,10 +112,12 @@ async fn sync_rows(a: &Replica<InMemoryRowStore>, b: &Replica<InMemoryRowStore>)
 async fn hai_may_sua_cung_ban_ghi_ngoai_tuyen_gop_theo_lww() {
     let a = replica(FP_A);
     let b = replica(FP_B);
-    a.write("chi", "1", json!({"so_tien": 100}), NOW - 2000);
-    a.write("chi", "chi-a", json!(1), NOW - 2000);
-    b.write("chi", "1", json!({"so_tien": 250}), NOW - 1000);
-    b.write("chi", "chi-b", json!(2), NOW - 1000);
+    a.write("chi", "1", json!({"so_tien": 100}), NOW - 2000)
+        .unwrap();
+    a.write("chi", "chi-a", json!(1), NOW - 2000).unwrap();
+    b.write("chi", "1", json!({"so_tien": 250}), NOW - 1000)
+        .unwrap();
+    b.write("chi", "chi-b", json!(2), NOW - 1000).unwrap();
     let (na, nb) = sync_rows(&a, &b).await;
     assert_eq!((na, nb), (2, 1)); // A nhận "1" (B sửa sau) + "chi-b"; B chỉ nhận "chi-a".
     for r in [&a, &b] {
@@ -131,10 +133,10 @@ async fn hai_may_sua_cung_ban_ghi_ngoai_tuyen_gop_theo_lww() {
 async fn xoa_va_sua_dong_thoi_qua_giao_thuc() {
     let a = replica(FP_A);
     let b = replica(FP_B);
-    a.write("chi", "1", json!(1), NOW - 5000);
+    a.write("chi", "1", json!(1), NOW - 5000).unwrap();
     sync_rows(&a, &b).await;
-    b.write("chi", "1", json!(2), NOW - 3000);
-    a.delete("chi", "1", NOW - 2000);
+    b.write("chi", "1", json!(2), NOW - 3000).unwrap();
+    a.delete("chi", "1", NOW - 2000).unwrap();
     sync_rows(&a, &b).await;
     assert_eq!(a.read("chi", "1"), None);
     assert_eq!(b.read("chi", "1"), None);
@@ -147,8 +149,8 @@ async fn ba_may_khong_sot_phien_ban_den_muon() {
     let a = replica(FP_A);
     let b = replica(FP_B);
     let c = replica("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
-    c.write("t", "tu-c", json!("c"), NOW - 9000);
-    b.write("t", "tu-b", json!("b"), NOW - 1000);
+    c.write("t", "tu-c", json!("c"), NOW - 9000).unwrap();
+    b.write("t", "tu-b", json!("b"), NOW - 1000).unwrap();
     sync_rows(&a, &b).await;
     for (_, r) in c.store().changes_after(0, 10) {
         b.merge(r, NOW).unwrap();
@@ -163,7 +165,8 @@ async fn dut_giua_chung_thi_noi_lai_khong_nhan_doi() {
     let b = replica(FP_B);
     let total = ROWS_PER_BATCH * 2 + 100;
     for i in 0..total {
-        b.write("chi", &format!("{i:05}"), json!({"i": i}), NOW - 10_000);
+        b.write("chi", &format!("{i:05}"), json!({"i": i}), NOW - 10_000)
+            .unwrap();
     }
     // Lần 1: luồng của B gãy sau khoảng 1,5 lô.
     let (mut x, y) = pipe();
@@ -199,11 +202,11 @@ async fn dut_giua_chung_thi_noi_lai_khong_nhan_doi() {
 async fn kho_lam_lai_thi_doc_lai_tu_dau() {
     let a = replica(FP_A);
     let b = replica(FP_B);
-    b.write("t", "k", json!(1), NOW - 10);
+    b.write("t", "k", json!(1), NOW - 10).unwrap();
     sync_rows(&a, &b).await;
     // B cài lại app: kho mới, mã nhật ký mới, seq bắt đầu lại từ 1.
     let b2 = replica(FP_B);
-    b2.write("t", "moi", json!(2), NOW - 5);
+    b2.write("t", "moi", json!(2), NOW - 5).unwrap();
     sync_rows(&a, &b2).await;
     assert_eq!(a.read("t", "moi"), Some(json!(2)));
     assert_eq!(b2.read("t", "k"), Some(json!(1))); // A trả lại dữ liệu cho B
@@ -245,7 +248,7 @@ async fn khac_luoc_do_thi_dung() {
 async fn khac_luoc_do_thi_run_khong_dong_du_lieu() {
     let a = replica(FP_A);
     let b = replica(FP_B);
-    b.write("t", "k", json!(1), NOW);
+    b.write("t", "k", json!(1), NOW).unwrap();
     let (mut x, mut y) = pipe();
     let (mut da, mut db) = (BTreeMap::new(), BTreeMap::new());
     let (fa, fb) = (no_files(), no_files());
@@ -513,11 +516,13 @@ async fn tron_phien_tren_mtls_tsulink_1() {
     std::fs::write(&anh_b, &anh).unwrap();
 
     let a = replica(&fa);
-    a.write("chi", "1", json!({"so_tien": 50}), NOW - 100);
+    a.write("chi", "1", json!({"so_tien": 50}), NOW - 100)
+        .unwrap();
     let fb2 = fb.clone();
     let srv = tokio::spawn(async move {
         let b = replica(&fb2);
-        b.write("chi", "2", json!({"anh": anh_hash}), NOW - 50);
+        b.write("chi", "2", json!({"anh": anh_hash}), NOW - 50)
+            .unwrap();
         let mut docs = BTreeMap::from([("ghi-chu".to_string(), doc_with("tu B"))]);
         let p = anh_b.clone();
         let files =

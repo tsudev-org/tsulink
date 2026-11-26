@@ -1,0 +1,26 @@
+[package]
+name = "tsulink-dart"
+version = "0.6.0"
+description = "Tsu Link - cầu Rust ↔ Dart (flutter_rust_bridge) bọc tsulink::node (ADR-0005)"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+publish = false
+
+[lib]
+# Tên KHÁC `tsulink` (thư viện C ABI) để hai cdylib không đè nhau trong target/. cargokit build theo tên này.
+name = "tsulink_dart"
+# cdylib: Android/Linux/Windows nạp động; staticlib: iOS/macOS liên kết tĩnh (cargokit chọn theo đích); rlib: test.
+crate-type = ["cdylib", "staticlib", "rlib"]
+
+[dependencies]
+# PHẢI khớp `flutter_rust_bridge` trong ../pubspec.yaml và codegen (scripts/gen-dart-bridge.sh).
+flutter_rust_bridge = "=2.13.0"
+tsulink = { path = "../../../crates/tsulink" }
+serde_json = "1.0.154"
+
+# KHÔNG `forbid(unsafe_code)`: mã do flutter_rust_bridge sinh (`frb_generated.rs`) dùng `unsafe` để trao con trỏ qua
+# FFI. Mã viết tay trong `src/api` bị cấm `unsafe` bằng `#![forbid(unsafe_code)]` ở `api/mod.rs`.
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }

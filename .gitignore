@@ -282,3 +282,7 @@ tauri.conf.local.json
 # --- WebAssembly ---
 pkg/
 wasm-pack.log
+
+# --- Ràng buộc (ADR-0005) ---
+# cargokit dựng lõi Rust cho app Flutter bằng build_tool/bin/build_tool.dart - mẫu `bin/` ở trên che mất nó.
+!bindings/dart/cargokit/build_tool/bin/

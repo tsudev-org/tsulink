@@ -1,0 +1,5 @@
+# Codegen flutter_rust_bridge - chạy qua scripts/gen-dart-bridge.sh (CI sinh lại và so git diff).
+rust_input: crate::api
+rust_root: rust/
+dart_output: lib/src/rust
+dart_format_line_length: 120
